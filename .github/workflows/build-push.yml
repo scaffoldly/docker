@@ -23,16 +23,19 @@ jobs:
         include:
           - name: terraform-node
             context: composite/terraform/node
+            tag: latest
             args: |
               TERRAFORM_TAG=latest
               NODE_TAG=slim
-          - name: terraform1.4.2-node16
+          - name: terraform-node
             context: composite/terraform/node
+            tag: terraform1.4.2-node16
             args: |
               TERRAFORM_TAG=1.4.2
               NODE_TAG=16-slim
-          - name: terraform1.4.2-node18
+          - name: terraform-node
             context: composite/terraform/node
+            tag: terraform1.4.2-node18
             args: |
               TERRAFORM_TAG=1.4.2
               NODE_TAG=18-slim
@@ -62,10 +65,10 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.name }}
             ghcr.io/${{ github.repository_owner }}/${{ matrix.name }}
           tags: |
-            type=sha
-            type=raw,value={{date 'YYYYMMDD'}},enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
-            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
-            type=schedule,pattern={{date 'YYYYMMDD'}}
+            type=raw,value=${{ matrix.tag }}
+            type=raw,value=${{ matrix.tag }}-${{ github.sha }}
+            type=raw,value=${{ matrix.tag }}-{{date 'YYYYMMDD'}},enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
+            type=schedule,pattern=${{ matrix.tag }}-{{date 'YYYYMMDD'}}
           labels: |
             maintainer=Scaffoldly <docker@scaffold.ly>
       - name: Build and push
