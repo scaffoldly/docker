@@ -22,19 +22,16 @@ jobs:
       matrix:
         include:
           - name: terraform-node
-            dockerfile: composite/terraform/node
             context: composite/terraform/node
             args: |
               TERRAFORM_TAG=latest
               NODE_TAG=slim
           - name: terraform1.4.2-node16
-            dockerfile: composite/terraform/node
             context: composite/terraform/node
             args: |
               TERRAFORM_TAG=1.4.2
               NODE_TAG=16-slim
           - name: terraform1.4.2-node18
-            dockerfile: composite/terraform/node
             context: composite/terraform/node
             args: |
               TERRAFORM_TAG=1.4.2
@@ -69,7 +66,7 @@ jobs:
         id: build-push
         uses: docker/build-push-action@v3
         with:
-          file: ${{ matrix.dockerfile }}
+          file: ${{ matrix.context }}/Dockerfile
           context: ${{ matrix.context }}
           build-args: ${{ matrix.args }}
           platforms: linux/amd64,linux/arm64
