@@ -23,19 +23,16 @@ jobs:
         include:
           - name: terraform-node
             dockerfile: composite/terraform/node
-            context: composite/terraform/node
             args: |
               TERRAFORM_TAG=latest
               NODE_TAG=slim
           - name: terraform1.4.2-node16
             dockerfile: composite/terraform/node
-            context: composite/terraform/node
             args: |
               TERRAFORM_TAG=1.4.2
               NODE_TAG=16-slim
           - name: terraform1.4.2-node18
             dockerfile: composite/terraform/node
-            context: composite/terraform/node
             args: |
               TERRAFORM_TAG=1.4.2
               NODE_TAG=18-slim
