@@ -2,6 +2,26 @@ server {
     listen 8080;
     listen [::]:8080;
     server_name localhost;
+    resolver 127.0.0.1;
+
+    set $my_http_host $http_host;
+    set $my_proxy_pass "http://localhost:4566";
+    set $my_request_uri $request_uri;
+    set $api_id "unknown";
+    set $api_gateway 0;
+
+    if ($http_host ~* "(.*)\.execute-api\.(.*)") {
+        set $api_id $1;
+        set $my_http_host $2;
+        set $api_gateway 1;
+    }
+    if ($request_uri ~* "/local(.*)") {
+        set $my_request_uri $1;
+    }
+
+    if ($api_gateway) {
+        set $my_proxy_pass "http://localhost:4566/restapis/$api_id/local/_user_request_$my_request_uri";
+    }
 
     location = /_proxy/health {
         access_log off;
@@ -9,17 +29,9 @@ server {
         return 200 '{"status":"UP"}';
     }
         
-    location /api {
-        proxy_pass http://localhost:4566/restapis/TODO/local/_user_request_/api;
-        proxy_set_header Host $http_host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-
     location / {
-        proxy_pass http://localhost:4566;
-        proxy_set_header Host $http_host;
+        proxy_pass $my_proxy_pass;
+        proxy_set_header Host $my_http_host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;

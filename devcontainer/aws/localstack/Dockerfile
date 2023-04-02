@@ -5,10 +5,10 @@ FROM mcr.microsoft.com/devcontainers/base:${BASE_IMAGE}
 RUN apt-get update && \
     apt-get install -y \
     libsasl2-dev gcc \
-    supervisor \
-    nginx \
+    dnsmasq dnsutils \
+    supervisor nginx \
     python3.10 python3-venv python3-pip python3-dev \
-    nodejs \ 
+    nodejs \
     && pip install --no-cache-dir pipx supervisor supervisor_checks aiohttp aiodns fastapi "uvicorn[standard]" \
     && pipx install --editable --include-deps localstack[full]==1.4 \
     && pipx install awscli-local \
