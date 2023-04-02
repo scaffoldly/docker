@@ -1,14 +1,16 @@
 ARG BASE_IMAGE=jammy
 FROM mcr.microsoft.com/devcontainers/base:${BASE_IMAGE}
 
+# TODO Remove nodejs
 RUN apt-get update && \
     apt-get install -y \
     libsasl2-dev gcc \
     supervisor \
     nginx \
     python3.10 python3-venv python3-pip python3-dev \
+    nodejs \ 
     && pip install --no-cache-dir pipx supervisor supervisor_checks aiohttp aiodns fastapi "uvicorn[standard]" \
-    && pipx install --include-deps localstack[full]==1.4 \
+    && pipx install --editable --include-deps localstack[full]==1.4 \
     && pipx install awscli-local \
     && rm -rf /var/lib/apt/lists/*
 
