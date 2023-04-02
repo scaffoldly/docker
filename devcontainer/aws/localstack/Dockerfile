@@ -1,5 +1,5 @@
 ARG BASE_IMAGE=jammy
-FROM mcr.microsoft.com/devcontainers/base:${BASE_IMAGE}}
+FROM mcr.microsoft.com/devcontainers/base:${BASE_IMAGE}
 
 RUN apt-get update && \
     apt-get install -y \
