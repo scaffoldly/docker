@@ -26,14 +26,8 @@ COPY etc /etc
 COPY usr /usr
 COPY start.sh /
 
-# Health
-EXPOSE 9000
-# Localstack
-EXPOSE 4566
-# API Gateway Proxy (TODO Figure Out API Gateway IDs)
+# Localstack Proxy
 EXPOSE 8080
-# CloudFront Proxy (TODO)
-EXPOSE 3000
 
 ENV TEST_AWS_ACCOUNT_ID="000000000000"
 ENV DEFAULT_REGION="us-east-1"
