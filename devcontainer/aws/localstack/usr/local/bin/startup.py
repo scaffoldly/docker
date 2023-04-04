@@ -81,7 +81,7 @@ def load_localstack_pod():
         return
     
     write_stderr("Restoring localstack state")
-    os.system(f"localstack pod load file://{os.getenv('POD_PATH')}")
+    os.system(f"/root/.local/bin/localstack pod load file://{os.getenv('POD_PATH')}")
 
 def main():
 

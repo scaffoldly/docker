@@ -1,9 +1,9 @@
-#!/bin/bash -m
+#!/usr/bin/env bash
 set -Eeo pipefail
 
 function _intercept {
     echo "\nSaving localstack state"
-    localstack pod save file://${POD_PATH}
+    /root/.local/bin/localstack pod save file://${POD_PATH}
     kill -INT $child
     kill -TERM $tailchild
     exit 0
