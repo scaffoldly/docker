@@ -1,18 +1,19 @@
-#!/usr/bin/env bash
+#!/bin/bash -m
 set -Eeo pipefail
 
 function _intercept {
-    echo "Interrupting supervisord"
+    echo "\nSaving localstack state"
+    localstack pod save file://${POD_PATH}
     kill -INT $child
+    kill -TERM $tailchild
     exit 0
 }
 
 trap _intercept SIGTERM
 trap _intercept SIGINT
 trap _intercept SIGQUIT
-trap _intercept EXIT
 
-tail -f /var/log/supervisor/services.log &
+tail -n0 -f /var/log/supervisor/services.log & tailchild=$!
 /usr/bin/supervisord -c /etc/supervisor/supervisord.conf -n -s & child=$!
 
 wait "$child"

@@ -2,6 +2,7 @@
 from time import sleep
 from supervisor.childutils import listener
 import sys
+import os
 
 from xmlrpc.client import ServerProxy
 
@@ -75,6 +76,13 @@ def wait_then_start(port, thenstart):
         wait_then_start(port, thenstart)
 
 
+def load_localstack_pod():
+    if not os.path.exists(os.getenv("POD_PATH")):
+        return
+    
+    write_stderr("Restoring localstack state")
+    os.system(f"localstack pod load file://{os.getenv('POD_PATH')}")
+
 def main():
 
     while True:
@@ -98,6 +106,7 @@ def main():
         write_stdout("RESULT 2\nOK")
 
         if eventname == "PROCESS_STATE_RUNNING" and processname == "proxy":
+            load_localstack_pod()
             write_stderr(f"All services started!")
             supervisor.stop("startup")
 
