@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   devcontainer:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     strategy:
       matrix:
         include:
@@ -70,11 +70,11 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=${{ matrix.name }}-${{ matrix.tag }}
-          cache-to: type=gha,scope=${{ matrix.name }}-${{ matrix.tag }},mode=max
+          cache-from: type=gha,scope=${{ runnder.os }}-${{ matrix.name }}-${{ matrix.tag }}
+          cache-to: type=gha,scope=${{ runnder.os }}-${{ matrix.name }}-${{ matrix.tag }},mode=max
 
   composite:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     strategy:
       matrix:
         include:
@@ -140,5 +140,5 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=${{ matrix.name }}-${{ matrix.tag }}
-          cache-to: type=gha,scope=${{ matrix.name }}-${{ matrix.tag }},mode=max
+          cache-from: type=gha,scope=${{ runnder.os }}-${{ matrix.name }}-${{ matrix.tag }}
+          cache-to: type=gha,scope=${{ runnder.os }}-${{ matrix.name }}-${{ matrix.tag }},mode=max

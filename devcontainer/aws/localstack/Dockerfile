@@ -17,7 +17,7 @@ RUN pip install --no-cache-dir pipx supervisor supervisor_checks aiohttp aiodns 
 RUN pipx install awscli 
 RUN pipx install awscliv2
 RUN pipx install awscli-local 
-RUN pipx install --include-deps localstack[full]==2.0
+RUN pipx install --include-deps localstack[full]==2.0.1
 
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.10 1
 
