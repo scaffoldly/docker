@@ -1,10 +1,9 @@
 ARG BASE_IMAGE=jammy
 FROM mcr.microsoft.com/devcontainers/base:${BASE_IMAGE}
 
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
-
 # Generic Tooling
-RUN apt-get update && \
+RUN curl -fsSL https://get.docker.com | bash - && \
+    curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
     apt-get install -y \
     libsasl2-dev gcc \
     dnsmasq dnsutils \
