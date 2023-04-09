@@ -3,6 +3,7 @@ FROM mcr.microsoft.com/devcontainers/base:${BASE_IMAGE}
 
 RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
 
+# Generic Tooling
 RUN apt-get update && \
     apt-get install -y \
     libsasl2-dev gcc \
@@ -38,8 +39,11 @@ EXPOSE 8080
 ENV ACTIVATE_PRO=0
 ENV TEST_AWS_ACCOUNT_ID="000000000000"
 ENV GATEWAY_LISTEN="0.0.0.0"
-ENV POD_PATH="/var/lib/localstack/pod"
 
 # AWS Env
 ENV AWS_DEFAULT_REGION="us-east-1"
 ENV AWS_ENDPOINT_URL="http://localhost:8080"
+
+# Runtime Env
+ENV STAGE="local"
+ENV POD_PATH="/var/lib/localstack/pod"
