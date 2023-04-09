@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   devcontainer:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
@@ -74,7 +74,7 @@ jobs:
           cache-to: type=gha,scope=${{ runner.os }}-${{ matrix.name }}-${{ matrix.tag }},mode=max
 
   composite:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
