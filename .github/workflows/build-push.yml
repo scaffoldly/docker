@@ -142,3 +142,58 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=${{ runner.os }}-${{ matrix.name }}-${{ matrix.tag }}
           cache-to: type=gha,scope=${{ runner.os }}-${{ matrix.name }}-${{ matrix.tag }},mode=max
+
+  awslambda:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: awslambda-hello-world
+            context: awslambda/hello-world
+            tag: latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.name }}
+            ghcr.io/${{ github.repository_owner }}/${{ matrix.name }}
+          tags: |
+            type=raw,value=${{ matrix.tag }}
+            type=raw,value=${{ matrix.tag }}-${{ github.sha }}
+            type=raw,value=${{ matrix.tag }}-{{date 'YYYYMMDD'}},enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
+            type=schedule,pattern=${{ matrix.tag }}-{{date 'YYYYMMDD'}}
+          labels: |
+            maintainer=Scaffoldly <docker@scaffold.ly>
+      - name: Build and push
+        id: build-push
+        uses: docker/build-push-action@v4
+        with:
+          file: ${{ matrix.context }}/Dockerfile
+          context: ${{ matrix.context }}
+          build-args: ${{ matrix.args }}
+          platforms: linux/amd64,linux/arm64
+          pull: true
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=${{ runner.os }}-${{ matrix.name }}-${{ matrix.tag }}
+          cache-to: type=gha,scope=${{ runner.os }}-${{ matrix.name }}-${{ matrix.tag }},mode=max
