@@ -2,7 +2,7 @@ server {
     listen 8080;
     listen [::]:8080;
     server_name localhost;
-    resolver 127.0.0.1;
+    resolver 127.0.0.1:5353;
 
     set $my_http_host $http_host;
     set $my_proxy_pass "http://localhost:4566";
