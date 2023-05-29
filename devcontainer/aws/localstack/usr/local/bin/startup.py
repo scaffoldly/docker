@@ -23,7 +23,7 @@ class SupervisorClient(object):
     """ Supervisor client to work with remote supervisor
     """
 
-    def __init__(self, host='127.0.0.1', port=9001):
+    def __init__(self, host='127.0.0.1', port=9999):
         self.server = ServerProxy('http://{}:{}/RPC2'.format(host, port))
 
     def _generate_correct_process_name(self, process):
