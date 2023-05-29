@@ -41,7 +41,7 @@ ENV GATEWAY_LISTEN="0.0.0.0"
 
 # AWS Env
 ENV AWS_DEFAULT_REGION="us-east-1"
-ENV AWS_ENDPOINT_URL="http://localhost:8080"
+ENV AWS_ENDPOINT_URL="http://localhost:4566"
 
 # Runtime Env
 ENV STAGE="local"
