@@ -9,7 +9,7 @@ on:
     branches:
       - "main"
   schedule:
-    - cron: "* 12 * * 0" # Rebuild Weekly, 12:30 Sundays picked arbitrarily
+    - cron: "30 12 * * 0" # Rebuild Weekly, 12:30 Sundays picked arbitrarily
 
 permissions:
   contents: read

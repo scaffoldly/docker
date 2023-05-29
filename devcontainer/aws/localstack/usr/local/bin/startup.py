@@ -98,7 +98,7 @@ def main():
             if processname == "health":
                 wait_then_start(9000, "dnsmasq")
             if processname == "dnsmasq":
-                wait_then_start(53, "localstack")
+                wait_then_start(5353, "localstack")
             if processname == "localstack":
                 wait_then_start(4566, "proxy")
 
