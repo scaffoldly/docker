@@ -181,16 +181,16 @@ jobs:
           role: arn:aws:iam::557208059266:role/docker@scaffold.ly
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Generate ECR Password
-        id: ecr
-        run: |
-          echo "::set-output name=password::$(aws ecr-public get-login-password --region us-east-1)"
+      # - name: Generate ECR Password
+      #   id: ecr
+      #   run: |
+      #     echo "::set-output name=password::$(aws ecr-public get-login-password --region us-east-1)"
       - name: Login to ECR
         uses: docker/login-action@v2
         with:
           registry: public.ecr.aws
-          username: ${{ github.repository_owner }}
-          password: ${{ steps.ecr.outputs.password }}
+          # username: ${{ github.repository_owner }}
+          # password: ${{ steps.ecr.outputs.password }}
 
       - name: Docker meta
         id: meta
