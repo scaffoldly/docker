@@ -1,32 +1,39 @@
 ARG BASE_IMAGE=jammy
 FROM mcr.microsoft.com/devcontainers/base:${BASE_IMAGE}
 
-ENV NODE_MAJOR=16
+ARG NODE_MAJOR=16
+ENV NODE_MAJOR=${NODE_MAJOR}
 
-ENV LOCALSTACK_MAJOR=2
-ENV LOCALSTACK_MINOR=2
+ARG LOCALSTACK_MAJOR=2
+ENV LOCALSTACK_MAJOR=${LOCALSTACK_MAJOR}
+ARG LOCALSTACK_MINOR=2
+ENV LOCALSTACK_MINOR=${LOCALSTACK_MINOR}
 
-ENV PYTHON_MAJOR=3
-ENV PYTHON_MINOR=10
+ARG PYTHON_MAJOR=3
+ENV PYTHON_MAJOR=${PYTHON_MAJOR}
+ARG PYHON_MINOR=3
+ENV PYTHON_MINOR=${PYTHON_MINOR}
 
 # Generic Tooling
 RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
     echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_MAJOR}.x nodistro main" > /etc/apt/sources.list.d/nodesource.list && \
     curl -fsSL https://get.docker.com | bash - && \
     apt-get install -y \
-    libsasl2-dev gcc \
+    ca-certificates \
+    libsasl2-dev \
+    gcc g++ make \
     dnsmasq dnsutils \
     supervisor nginx \
     python${PYTHON_MAJOR}.${PYTHON_MINOR} python${PYTHON_MAJOR}-venv python${PYTHON_MAJOR}-pip python${PYTHON_MAJOR}-dev \
     nodejs \
     && rm -rf /var/lib/apt/lists/*
 
-RUN npm install --global nx cdktf-cli yarn
+RUN npm install --global npm yarn nx cdktf-cli
 RUN pip install --no-cache-dir pipx supervisor supervisor_checks aiohttp aiodns fastapi "uvicorn[standard]"
+RUN pipx install --include-deps localstack[full]==${LOCALSTACK_MAJOR}.${LOCALSTACK_MINOR}
 RUN pipx install awscli 
 RUN pipx install awscliv2
 RUN pipx install awscli-local 
-RUN pipx install --include-deps localstack[full]==${LOCALSTACK_MAJOR}.${LOCALSTACK_MINOR}
 
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON_MAJOR}.${PYTHON_MINOR} 1
 
