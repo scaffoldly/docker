@@ -12,7 +12,7 @@ RUN curl -fsSL https://get.docker.com | bash - && \
     nodejs \
     && rm -rf /var/lib/apt/lists/*
 
-RUN npm install --global nx cdktf-cli
+RUN npm install --global nx cdktf-cli yarn
 RUN pip install --no-cache-dir pipx supervisor supervisor_checks aiohttp aiodns fastapi "uvicorn[standard]"
 RUN pipx install awscli 
 RUN pipx install awscliv2
