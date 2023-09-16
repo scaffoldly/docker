@@ -1,14 +1,23 @@
 ARG BASE_IMAGE=jammy
 FROM mcr.microsoft.com/devcontainers/base:${BASE_IMAGE}
 
+ENV NODE_MAJOR=16
+
+ENV LOCALSTACK_MAJOR=2
+ENV LOCALSTACK_MINOR=2
+
+ENV PYTHON_MAJOR=3
+ENV PYTHON_MINOR=10
+
 # Generic Tooling
-RUN curl -fsSL https://get.docker.com | bash - && \
-    curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
+RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
+    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_MAJOR}.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list \
+    curl -fsSL https://get.docker.com | bash - && \
     apt-get install -y \
     libsasl2-dev gcc \
     dnsmasq dnsutils \
     supervisor nginx \
-    python3.10 python3-venv python3-pip python3-dev \
+    python${PYTHON_MAJOR}.${PYTHON_MINOR} python${PYTHON_MAJOR}-venv python${PYTHON_MAJOR}-pip python${PYTHON_MAJOR}-dev \
     nodejs \
     && rm -rf /var/lib/apt/lists/*
 
@@ -17,9 +26,9 @@ RUN pip install --no-cache-dir pipx supervisor supervisor_checks aiohttp aiodns 
 RUN pipx install awscli 
 RUN pipx install awscliv2
 RUN pipx install awscli-local 
-RUN pipx install --include-deps localstack[full]==2.0.1
+RUN pipx install --include-deps localstack[full]==${LOCALSTACK_MAJOR}.${LOCALSTACK_MINOR}
 
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.10 1
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON_MAJOR}.${PYTHON_MINOR} 1
 
 # Log Redirection
 RUN mkdir -p /var/log/supervisor
