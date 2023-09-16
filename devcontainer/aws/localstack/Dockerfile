@@ -24,18 +24,21 @@ RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg -
     gcc g++ make \
     dnsmasq dnsutils \
     supervisor nginx \
-    python${PYTHON_MAJOR}.${PYTHON_MINOR} python${PYTHON_MAJOR}-venv python${PYTHON_MAJOR}-pip python${PYTHON_MAJOR}-dev \
     nodejs \
+    python${PYTHON_MAJOR}.${PYTHON_MINOR} python${PYTHON_MAJOR}-venv python${PYTHON_MAJOR}-pip python${PYTHON_MAJOR}-dev \
+    update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON_MAJOR}.${PYTHON_MINOR} 1 \
     && rm -rf /var/lib/apt/lists/*
 
+# Node Core Tooling
 RUN npm install --global npm yarn nx cdktf-cli
+
+# Python Core Tooling
 RUN pip install --no-cache-dir pipx supervisor supervisor_checks aiohttp aiodns fastapi "uvicorn[standard]"
+RUN pipx ensurepath
 RUN pipx install --include-deps localstack[full]==${LOCALSTACK_MAJOR}.${LOCALSTACK_MINOR}
 RUN pipx install awscli 
 RUN pipx install awscliv2
 RUN pipx install awscli-local 
-
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON_MAJOR}.${PYTHON_MINOR} 1
 
 # Log Redirection
 RUN mkdir -p /var/log/supervisor
