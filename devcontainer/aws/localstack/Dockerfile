@@ -45,4 +45,5 @@ ENV AWS_ENDPOINT_URL="http://localhost:4566"
 
 # Runtime Env
 ENV STAGE="local"
+ENV LOCALSTACK="true"
 ENV POD_PATH="/var/lib/localstack/pod"
