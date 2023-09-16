@@ -65,7 +65,7 @@ jobs:
           file: ${{ matrix.context }}/Dockerfile
           context: ${{ matrix.context }}
           build-args: ${{ matrix.args }}
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64 # ,linux/arm64 (speeding up builds for a bit)
           pull: true
           push: true
           tags: ${{ steps.meta.outputs.tags }}
