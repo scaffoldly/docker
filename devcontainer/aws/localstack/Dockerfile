@@ -22,14 +22,19 @@ RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg -
     echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_MAJOR}.x nodistro main" > /etc/apt/sources.list.d/nodesource.list && \
     curl -fsSL https://get.docker.com | bash - && \
     apt-get install -y \
-    ca-certificates \
+    ca-certificates software-properties-common \
     libsasl2-dev \
     gcc g++ make \
     dnsmasq dnsutils \
     supervisor nginx \
     nodejs \
     openjdk-${JAVA_MAJOR}-jdk openjdk-${JAVA_MAJOR}-jre \
-    python${PYTHON_MAJOR}.${PYTHON_MINOR} python${PYTHON_MAJOR}-venv python${PYTHON_MAJOR}-pip python${PYTHON_MAJOR}-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN add-apt-repository ppa:deadsnakes/ppa && \
+    apt-get update && \
+    apt-get install -y \
+    python${PYTHON_MAJOR}.${PYTHON_MINOR} python${PYTHON_MAJOR}-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Primary Versions
@@ -39,12 +44,13 @@ RUN update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON
 RUN npm install --global npm yarn nx cdktf-cli
 
 # Python Core Tooling
+RUN python -m ensurepip --upgrade
 RUN pip install --no-cache-dir pipx supervisor supervisor_checks
 RUN pipx ensurepath
-RUN pipx install --include-deps localstack[full]==${LOCALSTACK_MAJOR}.${LOCALSTACK_MINOR}
 RUN pipx install awscli 
 RUN pipx install awscliv2
 RUN pipx install awscli-local 
+RUN pipx install --include-deps localstack[full]==${LOCALSTACK_MAJOR}.${LOCALSTACK_MINOR}
 
 # Log Redirection
 RUN mkdir -p /var/log/supervisor
