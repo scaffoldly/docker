@@ -39,7 +39,7 @@ RUN update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON
 RUN npm install --global npm yarn nx cdktf-cli
 
 # Python Core Tooling
-RUN pip install --no-cache-dir pipx supervisor supervisor_checks aiohttp aiodns fastapi "uvicorn[standard]"
+RUN pip install --no-cache-dir pipx supervisor supervisor_checks
 RUN pipx ensurepath
 RUN pipx install --include-deps localstack[full]==${LOCALSTACK_MAJOR}.${LOCALSTACK_MINOR}
 RUN pipx install awscli 
@@ -75,4 +75,4 @@ ENV AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE=1
 # Runtime Env
 ENV STAGE="local"
 ENV LOCALSTACK="true"
-ENV POD_PATH="/var/lib/localstack/pod"
+# ENV POD_PATH="/var/lib/localstack/pod"

@@ -95,8 +95,6 @@ def main():
         write_stderr(f"Received {eventname} from {processname}.")
 
         if eventname == "PROCESS_STATE_RUNNING":
-            if processname == "health":
-                wait_then_start(9000, "dnsmasq")
             if processname == "dnsmasq":
                 wait_then_start(5353, "localstack")
             if processname == "localstack":
@@ -106,7 +104,7 @@ def main():
         write_stdout("RESULT 2\nOK")
 
         if eventname == "PROCESS_STATE_RUNNING" and processname == "proxy":
-            load_localstack_pod()
+            # load_localstack_pod()
             write_stderr(f"All services started!")
             supervisor.stop("startup")
 
