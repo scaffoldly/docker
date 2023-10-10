@@ -23,7 +23,7 @@ RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg -
     curl -fsSL https://get.docker.com | bash - && \
     apt-get install -y \
     ca-certificates software-properties-common \
-    libsasl2-dev \
+    libsasl2-dev libsnappy-dev \
     gcc g++ make \
     dnsmasq dnsutils \
     supervisor nginx \
@@ -46,7 +46,7 @@ RUN npm install --global npm yarn nx cdktf-cli
 # Python Core Tooling
 RUN curl -fsSL https://bootstrap.pypa.io/get-pip.py | python
 RUN pip install --no-cache-dir pipx supervisor supervisor_checks
-RUN pipx ensurepath
+ENV PATH="${PATH}:/root/.local/bin"
 RUN pipx install awscli 
 RUN pipx install awscliv2
 RUN pipx install awscli-local 
