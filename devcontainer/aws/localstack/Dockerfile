@@ -34,7 +34,7 @@ RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg -
 RUN add-apt-repository ppa:deadsnakes/ppa && \
     apt-get update && \
     apt-get install -y \
-    python${PYTHON_MAJOR}.${PYTHON_MINOR} python${PYTHON_MAJOR}-dev \
+    python${PYTHON_MAJOR}.${PYTHON_MINOR} python${PYTHON_MAJOR}.${PYTHON_MINOR}-dev python${PYTHON_MAJOR}.${PYTHON_MINOR}-venv \
     && rm -rf /var/lib/apt/lists/*
 
 # Primary Versions
@@ -44,7 +44,7 @@ RUN update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON
 RUN npm install --global npm yarn nx cdktf-cli
 
 # Python Core Tooling
-RUN python -m ensurepip --upgrade
+RUN curl -fsSL https://bootstrap.pypa.io/get-pip.py | python
 RUN pip install --no-cache-dir pipx supervisor supervisor_checks
 RUN pipx ensurepath
 RUN pipx install awscli 
