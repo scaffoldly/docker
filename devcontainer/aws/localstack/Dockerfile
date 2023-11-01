@@ -45,7 +45,7 @@ RUN npm install --global npm yarn nx cdktf-cli
 
 # Python Core Tooling
 RUN curl -fsSL https://bootstrap.pypa.io/get-pip.py | python
-RUN pip install --no-cache-dir pipx supervisor supervisor_checks
+RUN pip install --no-cache-dir pipx supervisor supervisor_checks amazon-kclpy
 ENV PATH="${PATH}:/root/.local/bin"
 RUN pipx install awscli 
 RUN pipx install awscliv2
