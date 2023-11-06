@@ -6,6 +6,7 @@ ENV PYTHON_MAJOR=3
 ENV PYTHON_MINOR=11
 ENV LOCALSTACK_MAJOR=2
 ENV LOCALSTACK_MINOR=3
+ENV LOCALSTACK_PATCH=2
 
 # Generic Tooling
 RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
@@ -40,7 +41,7 @@ ENV PATH="${PATH}:/root/.local/bin"
 RUN pipx install awscli 
 RUN pipx install awscliv2
 RUN pipx install awscli-local 
-RUN pipx install --include-deps localstack[full]==${LOCALSTACK_MAJOR}.${LOCALSTACK_MINOR}
+RUN pipx install --include-deps localstack[full]==${LOCALSTACK_MAJOR}.${LOCALSTACK_MINOR}.${LOCALSTACK_PATCH}
 
 # Log Redirection
 RUN mkdir -p /var/log/supervisor
