@@ -5,8 +5,8 @@ ENV JAVA_MAJOR=17
 ENV PYTHON_MAJOR=3
 ENV PYTHON_MINOR=11
 ENV LOCALSTACK_MAJOR=2
-ENV LOCALSTACK_MINOR=3
-ENV LOCALSTACK_PATCH=2
+ENV LOCALSTACK_MINOR=2
+ENV LOCALSTACK_PATCH=0
 
 # Generic Tooling
 RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
@@ -63,10 +63,6 @@ ENV GATEWAY_LISTEN="0.0.0.0:4566"
 ENV OVERRIDE_IN_DOCKER=1
 
 # AWS Env
-ENV AWS_ENDPOINT_URL="http://localhost.localstack.cloud:4566"
-ENV AWS_DEFAULT_REGION="us-east-1"
-ENV AWS_ACCESS_KEY_ID=test
-ENV AWS_SECRET_ACCESS_KEY=test
 ENV AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE=1
 
 # Runtime Env
