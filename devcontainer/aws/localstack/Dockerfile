@@ -50,6 +50,7 @@ RUN touch /var/log/supervisor/services.log
 RUN ln -sf /dev/stdout /var/log/nginx/access.log
 RUN ln -sf /dev/stderr /var/log/nginx/error.log
 
+COPY root /root
 COPY bin /bin
 COPY etc /etc
 COPY usr /usr
