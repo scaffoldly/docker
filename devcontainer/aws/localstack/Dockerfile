@@ -32,7 +32,8 @@ RUN add-apt-repository ppa:deadsnakes/ppa && \
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON_MAJOR}.${PYTHON_MINOR} 1
 
 # Node Core Tooling
-RUN npm install --global npm yarn nx cdktf-cli
+RUN npm install --global npm yarn nx typescript prettier eslint
+# Skipped: cdktf-cli
 
 # Python Core Tooling
 RUN curl -fsSL https://bootstrap.pypa.io/get-pip.py | python
