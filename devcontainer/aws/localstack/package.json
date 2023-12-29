@@ -1,0 +1,12 @@
+{
+  "name": "aws-localstack",
+  "version": "0.0.0",
+  "description": "Dev Tooling for aws-localstack",
+  "author": "Scaffoldly",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "eslint": ">=8",
+    "prettier": ">=3",
+    "typescript": ">=5"
+  }
+}

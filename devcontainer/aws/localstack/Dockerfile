@@ -32,7 +32,7 @@ RUN add-apt-repository ppa:deadsnakes/ppa && \
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON_MAJOR}.${PYTHON_MINOR} 1
 
 # Node Core Tooling
-RUN npm install --global npm yarn nx typescript prettier eslint
+RUN npm install --global npm yarn nx
 # Skipped: cdktf-cli
 
 # Python Core Tooling
@@ -53,6 +53,12 @@ RUN ln -sf /dev/stderr /var/log/nginx/error.log
 COPY bin /bin
 COPY etc /etc
 COPY usr /usr
+
+# Dev Tooling
+# DEVNOTE: Installing to "/" (root) so packages like "prettier" can locate the package.json
+COPY package.json /package.json
+RUN npm install
+ENV PATH="${PATH}:/node_modules/.bin"
 
 # Localstack Proxy
 EXPOSE 8080
