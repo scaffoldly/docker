@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/devcontainers/base:jammy
 
-ENV NODE_MAJOR=18
+ENV NODE_MAJOR=20
 ENV JAVA_MAJOR=17
 ENV PYTHON_MAJOR=3
 ENV PYTHON_MINOR=10
