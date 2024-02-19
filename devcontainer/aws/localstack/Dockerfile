@@ -5,8 +5,8 @@ ENV JAVA_MAJOR=17
 ENV PYTHON_MAJOR=3
 ENV PYTHON_MINOR=10
 ENV LOCALSTACK_MAJOR=3
-ENV LOCALSTACK_MINOR=0
-ENV LOCALSTACK_PATCH=2
+ENV LOCALSTACK_MINOR=1
+ENV LOCALSTACK_PATCH=0
 
 # Generic Tooling
 RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
