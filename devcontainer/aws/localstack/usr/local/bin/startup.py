@@ -119,7 +119,7 @@ def main():
 
         if eventname == "PROCESS_STATE_RUNNING":
             if processname == "dnsmasq":
-                wait_then_start(5353, "dind") 
+                wait_then_start(5353, "docker") 
             if processname == "dind":
                 wait_then_start(2375, "localstack")
             if processname == "localstack":
