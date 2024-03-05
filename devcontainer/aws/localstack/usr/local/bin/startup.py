@@ -122,7 +122,7 @@ def main():
                 wait_then_start(5353, "dind") 
             if processname == "dind":
                 wait_then_start(2375, "localstack")
-            if processname == "localstack"
+            if processname == "localstack":
                 wait_then_stop(4566, "startup")
 
         # acknowledge the event
