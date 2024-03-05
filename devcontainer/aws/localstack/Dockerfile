@@ -52,12 +52,6 @@ RUN pipx install awscliv2
 RUN pipx install awscli-local 
 RUN pipx install --include-deps localstack[full]==${LOCALSTACK_MAJOR}.${LOCALSTACK_MINOR}.${LOCALSTACK_PATCH}
 
-# Log Redirection
-RUN mkdir -p /var/log/supervisor
-RUN touch /var/log/supervisor/services.log
-RUN ln -sf /dev/stdout /var/log/nginx/access.log
-RUN ln -sf /dev/stderr /var/log/nginx/error.log
-
 COPY root /root
 COPY bin /bin
 COPY etc /etc

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -Eeo pipefail
+
+if [ "$1" == "localstack" ]; then
+    supervisorctl restart localstack
+else
+    echo "Invalid argument. Please use 'localstack' as the first parameter."
+    exit -1
+fi

@@ -57,6 +57,12 @@ def start(process):
     except Exception as e:
         write_stderr(f"WARN: Unable to start: {e}")
 
+def stop(process):
+    try:
+        supervisor.stop(process)
+    except Exception as e:
+        write_stderr(f"WARN: Unable to stop: {e}")
+
 
 def wait_then_start(port, thenstart):
     write_stderr(f"Waiting for port {port}...")
@@ -74,6 +80,23 @@ def wait_then_start(port, thenstart):
 
     except Exception as e:
         wait_then_start(port, thenstart)
+
+def wait_then_stop(port, thenstop):
+    write_stderr(f"Waiting for port {port}...")
+    sleep(1)
+
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        result = sock.connect_ex(('127.0.0.1', port))
+        sock.close()
+
+        if result == 0:
+            stop(thenstop)
+        else:
+            wait_then_stop(port, thenstop)
+
+    except Exception as e:
+        wait_then_stop(port, thenstop)
 
 
 def load_localstack_pod():
@@ -96,17 +119,18 @@ def main():
 
         if eventname == "PROCESS_STATE_RUNNING":
             if processname == "dnsmasq":
-                wait_then_start(5353, "localstack")
-            if processname == "localstack":
-                wait_then_start(4566, "proxy")
+                wait_then_start(5353, "dind") 
+            if processname == "dind":
+                wait_then_start(2375, "localstack")
+            if processname == "localstack"
+                wait_then_stop(4566, "startup")
 
         # acknowledge the event
         write_stdout("RESULT 2\nOK")
 
-        if eventname == "PROCESS_STATE_RUNNING" and processname == "proxy":
+        if eventname == "PROCESS_STATE_STOPPED" and processname == "startup":
             # load_localstack_pod()
             write_stderr(f"All services started!")
-            supervisor.stop("startup")
 
 
 if __name__ == '__main__':

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 set -Eeo pipefail
 
 function _intercept {
@@ -13,7 +14,11 @@ trap _intercept SIGTERM
 trap _intercept SIGINT
 trap _intercept SIGQUIT
 
-tail -n0 -f /var/log/supervisor/services.log & tailchild=$!
-/usr/bin/supervisord -c /etc/supervisor/supervisord.conf -n -s & child=$!
+if [ "$1" == "supervisor" ]; then
+    /usr/bin/supervisord -c /etc/supervisor/supervisord.conf -s -n & child=$!
+    wait "$child" || true
+else
+    echo "Invalid argument. Please use 'supervisor' as the first parameter."
+    exit -1
+fi
 
-wait "$child"
