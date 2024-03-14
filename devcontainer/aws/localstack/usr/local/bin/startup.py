@@ -119,10 +119,8 @@ def main():
 
         if eventname == "PROCESS_STATE_RUNNING":
             if processname == "dnsmasq":
-                # disabled while devcontainer postattachcommand not working
-                # wait_then_start(5353, "docker") 
-                wait_then_start(5353, "localstack") 
-            if processname == "docker":
+                wait_then_start(5353, "dind") 
+            if processname == "dind":
                 wait_then_start(2375, "localstack")
             if processname == "localstack":
                 wait_then_stop(4566, "startup")
