@@ -11,8 +11,9 @@ FROM mcr.microsoft.com/devcontainers/base:${BASE_IMAGE} as pkgsum
 
 RUN apt-get update && \
     apt-get upgrade && \
-    apt-get install -y \
-    debsums \
+    DEBIAN_FRONTEND=noninteractive \
+        apt-get install -y \
+            debsums \
     && rm -rf /var/lib/apt/lists/*
 
 RUN debsums --silent --all --generate=missing
@@ -31,8 +32,9 @@ COPY --from=pkgsum /var/lib/dpkg/sha256sum /var/lib/dpkg/sha256sum
 # OS Update
 RUN apt-get update && \
     apt-get upgrade && \
-    apt-get install -y \
-    debsums \
+    DEBIAN_FRONTEND=noninteractive \
+        apt-get install -y \
+            debsums \
     && rm -rf /var/lib/apt/lists/*
 
 ENV NODE_MAJOR=${NODE_MAJOR}
@@ -47,20 +49,24 @@ ENV LOCALSTACK_PATCH=${LOCALSTACK_PATCH}
 RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
     echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_MAJOR}.x nodistro main" > /etc/apt/sources.list.d/nodesource.list && \
     curl -fsSL https://get.docker.com | bash - && \
-    apt-get install -y \
-    ca-certificates software-properties-common \
-    libsasl2-dev libsnappy-dev \
-    gcc g++ make \
-    dnsmasq dnsutils \
-    supervisor nginx \
-    nodejs \
-    openjdk-${JAVA_MAJOR}-jdk openjdk-${JAVA_MAJOR}-jre \
+    DEBIAN_FRONTEND=noninteractive \
+        apt-get install -y \
+            ca-certificates software-properties-common \
+            libsasl2-dev libsnappy-dev \
+            gcc g++ make \
+            dnsmasq dnsutils \
+            supervisor nginx \
+            nodejs \
+            openjdk-${JAVA_MAJOR}-jdk openjdk-${JAVA_MAJOR}-jre \
     && rm -rf /var/lib/apt/lists/*
 
 RUN add-apt-repository ppa:deadsnakes/ppa && \
     apt-get update && \
-    apt-get install -y \
-    python${PYTHON_MAJOR}.${PYTHON_MINOR} python${PYTHON_MAJOR}.${PYTHON_MINOR}-dev python${PYTHON_MAJOR}.${PYTHON_MINOR}-venv \
+    DEBIAN_FRONTEND=noninteractive \
+        apt-get install -y \
+            python${PYTHON_MAJOR}.${PYTHON_MINOR} \
+            python${PYTHON_MAJOR}.${PYTHON_MINOR}-dev \
+            python${PYTHON_MAJOR}.${PYTHON_MINOR}-venv \
     && rm -rf /var/lib/apt/lists/*
 
 # Primary Versions
