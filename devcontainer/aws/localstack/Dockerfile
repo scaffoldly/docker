@@ -1,19 +1,46 @@
 ARG BASE_IMAGE=jammy
+ARG JAVA_MAJOR=17
+ARG PYTHON_MAJOR=3
+ARG PYTHON_MINOR=10
+ARG LOCALSTACK_MAJOR=3
+ARG LOCALSTACK_MINOR=1
+ARG LOCALSTACK_PATCH=0
+
+### Calculate package sums for conditional cache busting
+FROM mcr.microsoft.com/devcontainers/base:${BASE_IMAGE} as pkgsum
+
+RUN apt-get update && \
+    apt-get upgrade && \
+    apt-get install -y \
+    debsums \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN debsums --silent --all --generate=missing
+
+# Setup cache busting
+RUN cat /var/lib/dpkg/info/*.md5sums | sha256sum | cut -d' ' -f1 > /var/lib/dpkg/sha256sum
+
+### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ###
+### The actual devcontainer starts here... ###
+### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ###
 FROM mcr.microsoft.com/devcontainers/base:${BASE_IMAGE}
 
-ARG NODE_MAJOR=20
+# Cache busting on OS package upgrades
+COPY --from=pkgsum /var/lib/dpkg/sha256sum /var/lib/dpkg/sha256sum
+
+# OS Update
+RUN apt-get update && \
+    apt-get upgrade && \
+    apt-get install -y \
+    debsums \
+    && rm -rf /var/lib/apt/lists/*
+
 ENV NODE_MAJOR=${NODE_MAJOR}
-ARG JAVA_MAJOR=17
 ENV JAVA_MAJOR=${JAVA_MAJOR}
-ARG PYTHON_MAJOR=3
 ENV PYTHON_MAJOR=${PYTHON_MAJOR}
-ARG PYTHON_MINOR=10
 ENV PYTHON_MINOR=${PYTHON_MINOR}
-ARG LOCALSTACK_MAJOR=3
 ENV LOCALSTACK_MAJOR=${LOCALSTACK_MAJOR}
-ARG LOCALSTACK_MINOR=1
 ENV LOCALSTACK_MINOR=${LOCALSTACK_MINOR}
-ARG LOCALSTACK_PATCH=0
 ENV LOCALSTACK_PATCH=${LOCALSTACK_PATCH}
 
 # Generic Tooling
@@ -40,8 +67,13 @@ RUN add-apt-repository ppa:deadsnakes/ppa && \
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON_MAJOR}.${PYTHON_MINOR} 1
 
 # Node Core Tooling
-RUN npm install --global npm yarn nx
-# Skipped: cdktf-cli
+RUN npm install --global \
+    npm \
+    yarn \
+    nx \
+    prettier \
+    eslint \
+    typescript
 
 # Python Core Tooling
 RUN curl -fsSL https://bootstrap.pypa.io/get-pip.py | python
@@ -56,15 +88,6 @@ COPY root /root
 COPY bin /bin
 COPY etc /etc
 COPY usr /usr
-
-# Dev Tooling
-# DEVNOTE: Installing to "/" (root) so packages like "prettier" can locate the package.json
-COPY package.json /package.json
-RUN npm install
-ENV PATH="${PATH}:/node_modules/.bin"
-
-# Localstack Proxy
-EXPOSE 8080
 
 # Localstack Env
 ENV ACTIVATE_PRO=0
