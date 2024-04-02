@@ -1,27 +1,19 @@
 ARG BASE_IMAGE=jammy
-ARG NODE_MAJOR=20
-ARG JAVA_MAJOR=17
-ARG PYTHON_MAJOR=3
-ARG PYTHON_MINOR=10
-ARG LOCALSTACK_MAJOR=3
-ARG LOCALSTACK_MINOR=1
-ARG LOCALSTACK_PATCH=0
-
 FROM mcr.microsoft.com/devcontainers/base:${BASE_IMAGE}
 
-# OS Update
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y \
-        debsums \
-    && rm -rf /var/lib/apt/lists/*
-
+ARG NODE_MAJOR=20
 ENV NODE_MAJOR=${NODE_MAJOR}
+ARG JAVA_MAJOR=17
 ENV JAVA_MAJOR=${JAVA_MAJOR}
+ARG PYTHON_MAJOR=3
 ENV PYTHON_MAJOR=${PYTHON_MAJOR}
+ARG PYTHON_MINOR=10
 ENV PYTHON_MINOR=${PYTHON_MINOR}
+ARG LOCALSTACK_MAJOR=3
 ENV LOCALSTACK_MAJOR=${LOCALSTACK_MAJOR}
+ARG LOCALSTACK_MINOR=1
 ENV LOCALSTACK_MINOR=${LOCALSTACK_MINOR}
+ARG LOCALSTACK_PATCH=0
 ENV LOCALSTACK_PATCH=${LOCALSTACK_PATCH}
 
 # Generic Tooling
@@ -29,34 +21,27 @@ RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg -
     echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_MAJOR}.x nodistro main" > /etc/apt/sources.list.d/nodesource.list && \
     curl -fsSL https://get.docker.com | bash - && \
     apt-get install -y \
-        ca-certificates software-properties-common \
-        libsasl2-dev libsnappy-dev \
-        gcc g++ make \
-        dnsmasq dnsutils \
-        supervisor nginx \
-        nodejs \
-        openjdk-${JAVA_MAJOR}-jdk openjdk-${JAVA_MAJOR}-jre \
+    ca-certificates software-properties-common \
+    libsasl2-dev libsnappy-dev \
+    gcc g++ make \
+    dnsmasq dnsutils \
+    supervisor nginx \
+    nodejs \
+    openjdk-${JAVA_MAJOR}-jdk openjdk-${JAVA_MAJOR}-jre \
     && rm -rf /var/lib/apt/lists/*
 
 RUN add-apt-repository ppa:deadsnakes/ppa && \
     apt-get update && \
     apt-get install -y \
-        python${PYTHON_MAJOR}.${PYTHON_MINOR} \
-        python${PYTHON_MAJOR}.${PYTHON_MINOR}-dev \
-        python${PYTHON_MAJOR}.${PYTHON_MINOR}-venv \
+    python${PYTHON_MAJOR}.${PYTHON_MINOR} python${PYTHON_MAJOR}.${PYTHON_MINOR}-dev python${PYTHON_MAJOR}.${PYTHON_MINOR}-venv \
     && rm -rf /var/lib/apt/lists/*
 
 # Primary Versions
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON_MAJOR}.${PYTHON_MINOR} 1
 
 # Node Core Tooling
-RUN npm install --global \
-    npm \
-    yarn \
-    nx \
-    prettier \
-    eslint \
-    typescript
+RUN npm install --global npm yarn nx
+# Skipped: cdktf-cli
 
 # Python Core Tooling
 RUN curl -fsSL https://bootstrap.pypa.io/get-pip.py | python
