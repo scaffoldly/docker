@@ -6,28 +6,7 @@ ARG LOCALSTACK_MAJOR=3
 ARG LOCALSTACK_MINOR=1
 ARG LOCALSTACK_PATCH=0
 
-### Calculate package sums for conditional cache busting
-FROM mcr.microsoft.com/devcontainers/base:${BASE_IMAGE} as pkgsum
-
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y \
-    # MAKE SURE THESE PACKAGES MATCH THE INITIAL apt-get upgrade AFTER THE COPY COMMAND
-        debsums \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN debsums --silent --all --generate=missing || true
-
-# Setup cache busting
-RUN cat /var/lib/dpkg/info/*.md5sums | sha256sum | cut -d' ' -f1 > /var/lib/dpkg/sha256sum
-
-### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ###
-### The actual devcontainer starts here... ###
-### !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ###
 FROM mcr.microsoft.com/devcontainers/base:${BASE_IMAGE}
-
-# Cache busting on OS package upgrades
-COPY --from=pkgsum /var/lib/dpkg/sha256sum /var/lib/dpkg/sha256sum
 
 # OS Update
 RUN apt-get update && \
