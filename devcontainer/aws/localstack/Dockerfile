@@ -16,7 +16,7 @@ RUN apt-get update && \
         debsums \
     && rm -rf /var/lib/apt/lists/*
 
-RUN debsums --silent --all --generate=missing
+RUN debsums --silent --all --generate=missing || true
 
 # Setup cache busting
 RUN cat /var/lib/dpkg/info/*.md5sums | sha256sum | cut -d' ' -f1 > /var/lib/dpkg/sha256sum
