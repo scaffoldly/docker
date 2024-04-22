@@ -19,6 +19,8 @@ ENV LOCALSTACK_PATCH=${LOCALSTACK_PATCH}
 # Generic Tooling
 RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
     echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_MAJOR}.x nodistro main" > /etc/apt/sources.list.d/nodesource.list && \
+    wget -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" > /etc/apt/sources.list.d/github-cli.list && \
     curl -fsSL https://get.docker.com | bash - && \
     apt-get install -y \
     ca-certificates software-properties-common \
@@ -28,6 +30,7 @@ RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg -
     supervisor nginx \
     nodejs \
     openjdk-${JAVA_MAJOR}-jdk openjdk-${JAVA_MAJOR}-jre \
+    gh \
     && rm -rf /var/lib/apt/lists/*
 
 RUN add-apt-repository ppa:deadsnakes/ppa && \
