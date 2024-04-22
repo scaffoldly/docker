@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from time import sleep
 from supervisor.childutils import listener
+import subprocess
 import sys
 import os
 
@@ -123,6 +124,13 @@ def main():
             if processname == "dind":
                 wait_then_start(2375, "localstack")
             if processname == "localstack":
+                codespace_name = os.getenv("CODESPACE_NAME")
+
+                if codespace_name:
+                    write_stderr(f"Opening port 4566 for {codespace_name}")
+                    # TODO: Switch to API call to Ports API from Visual Studio Codespaces
+                    subprocess.run(["gh", "codespace", "ports", "visibility", "-c", codespace_name, "4566:public"])
+
                 wait_then_stop(4566, "startup")
 
         # acknowledge the event
