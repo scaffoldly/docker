@@ -32,7 +32,7 @@ RUN apt-get update && \
     ca-certificates software-properties-common \
     libsasl2-dev libsnappy-dev \
     gcc g++ make \
-    dnsmasq dnsutils \
+    dnsmasq dnsutils netcat \
     supervisor nginx \
     nodejs \
     openjdk-${JAVA_MAJOR}-jdk openjdk-${JAVA_MAJOR}-jre \
