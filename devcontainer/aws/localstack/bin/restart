@@ -3,7 +3,15 @@ set -Eeo pipefail
 
 if [ "$1" == "localstack" ]; then
     supervisorctl restart localstack
+elif [ "$1" == "supervisor" ]; then
+    supervisorctl stop all || true
+    killall supervisord || true
+    supervisord -c /etc/supervisor/supervisord.conf -s || true
+
+    while ! nc -z "127.0.0.1" 4566; do
+        sleep 1
+    done
 else
-    echo "Invalid argument. Please use 'localstack' as the first parameter."
+    echo "Invalid argument. Please use 'localstack' or 'supervisor' as the first parameter."
     exit -1
 fi

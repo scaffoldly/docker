@@ -100,6 +100,20 @@ def wait_then_stop(port, thenstop):
         wait_then_stop(port, thenstop)
 
 
+def open_port(port):
+    codespace_name = os.getenv("CODESPACE_NAME")
+    if codespace_name:
+        write_stderr(f"Opening port {port} for {codespace_name}")
+        subprocess.run(["gh", "codespace", "ports", "visibility", "-c", codespace_name, f"{port}:public"])
+
+
+def set_aws_config(port):
+    codespace_name = os.getenv("CODESPACE_NAME")
+    domain = os.getenv("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN")
+    if codespace_name and domain:
+        subprocess.run(["aws", "configure", "set", "default.endpoint_url", f"https://{codespace_name}-{port}.{domain}"])
+
+
 def load_localstack_pod():
     if not os.path.exists(os.getenv("POD_PATH")):
         return
@@ -124,13 +138,8 @@ def main():
             if processname == "dind":
                 wait_then_start(2375, "localstack")
             if processname == "localstack":
-                codespace_name = os.getenv("CODESPACE_NAME")
-
-                if codespace_name:
-                    write_stderr(f"Opening port 4566 for {codespace_name}")
-                    # TODO: Switch to API call to Ports API from Visual Studio Codespaces
-                    subprocess.run(["gh", "codespace", "ports", "visibility", "-c", codespace_name, "4566:public"])
-
+                open_port(4566)
+                set_aws_config(4566)
                 wait_then_stop(4566, "startup")
 
         # acknowledge the event
