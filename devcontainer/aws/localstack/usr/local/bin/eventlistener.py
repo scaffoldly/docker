@@ -57,13 +57,17 @@ class SupervisorClient(object):
 supervisor = SupervisorClient()
 
 
-def get_secret(key_name):
+def get_secret(key_name, max_attempts = 60):
     env_secrets = '/workspaces/.codespaces/shared/.env-secrets'
 
+    if max_attempts < 0:
+        write_stderr(f"Gave up looking for '{key_name}' from '{env_secrets}'!")
+        return None
+
     if not os.path.exists(env_secrets):
-        write_stderr(f"Waiting for {env_secrets} to exist...")
+        write_stderr(f"Waiting for '{env_secrets}' to exist...")
         sleep(1)
-        return get_secret(key_name)
+        return get_secret(key_name, max_attempts - 1)
 
     with open(env_secrets, 'r') as file:
         for line in file:
@@ -125,7 +129,12 @@ def open_port(port):
     if not codespace_name:
         return
 
+    github_token = get_secret("GITHUB_TOKEN")
+    if not github_token:
+        return
+
     write_stderr(f"Opening port {port} for {codespace_name}")
+    os.environ["GH_TOKEN"] = github_token
     os.system(f"gh codespace ports visibility -c {codespace_name} {port}:public")
 
 
