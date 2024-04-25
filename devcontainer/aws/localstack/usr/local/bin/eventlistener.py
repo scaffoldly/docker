@@ -71,7 +71,7 @@ def wait_for_port(port):
 
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        result = sock.connect_ex(('127.0.0.1', port))
+        result = sock.connect_ex(('127.0.0.1', int(port)))
         sock.close()
 
         if result == 0:
