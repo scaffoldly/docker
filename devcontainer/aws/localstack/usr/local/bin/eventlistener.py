@@ -135,7 +135,13 @@ def open_port(port):
 
     write_stderr(f"Opening port {port} for {codespace_name}")
     os.environ["GH_TOKEN"] = github_token
-    os.system(f"gh codespace ports visibility -c {codespace_name} {port}:public")
+    result = subprocess.run(["gh", "codespace", "ports", "visibility", "-c", codespace_name, f"{port}:public"], shell=True, capture_output=True, text=True)
+
+    if result.stderr:
+        write_stderr(stderr)
+
+    if result.stdout:
+        write_stderr(stdout)
 
 
 def set_aws_config(port):
