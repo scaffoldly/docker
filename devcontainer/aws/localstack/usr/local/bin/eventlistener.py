@@ -8,6 +8,7 @@ import os
 from xmlrpc.client import ServerProxy
 
 import socket
+import base64
 
 
 def write_stdout(s):
@@ -18,6 +19,13 @@ def write_stdout(s):
 def write_stderr(s):
     sys.stderr.write(f"{s}\n")
     sys.stderr.flush()
+
+
+def decode_base64(data):
+    if isinstance(data, str):
+        data = data.encode('utf-8')
+    decoded_bytes = base64.b64decode(data)
+    return decoded_bytes.decode('utf-8')
 
 
 class SupervisorClient(object):
@@ -47,6 +55,24 @@ class SupervisorClient(object):
 
 
 supervisor = SupervisorClient()
+
+
+def get_secret(key_name):
+    env_secrets = '/workspaces/.codespaces/shared/.env-secrets'
+
+    if not os.path.exists(pod_path):
+        write_stderr(f"Waiting for {env_secrets} to exist...")
+        sleep(1)
+        return get_secret(key_name)
+
+    with open(env_secrets, 'r') as file:
+        for line in file:
+            if line.startswith(f"{key_name}="):
+                # Split the line at '=' and strip any whitespace or newlines
+                _, encoded_value = line.strip().split('=', 1)
+                return decode_base64(encoded_value)
+
+    return None
 
 
 def start(process):
@@ -95,7 +121,7 @@ def open_port(port):
     if not port:
         return
 
-    codespace_name = os.getenv("CODESPACE_NAME")
+    codespace_name = get_secret("CODESPACE_NAME")
     if not codespace_name:
         return
 
@@ -108,11 +134,11 @@ def set_aws_config(port):
         os.system(f"aws configure set default.endpoint_url \"\"")
         return
 
-    codespace_name = os.getenv("CODESPACE_NAME")
+    codespace_name = get_secret("CODESPACE_NAME")
     if not codespace_name:
         return
 
-    domain = os.getenv("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN")
+    domain = get_secret("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN")
     if not domain:
         return
 
