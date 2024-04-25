@@ -21,9 +21,6 @@ def write_stderr(s):
 
 
 class SupervisorClient(object):
-    """ Supervisor client to work with remote supervisor
-    """
-
     def __init__(self, host='127.0.0.1', port=9999):
         self.server = ServerProxy('http://{}:{}/RPC2'.format(host, port))
 
@@ -65,9 +62,12 @@ def stop(process):
         write_stderr(f"WARN: Unable to stop: {e}")
 
 
-def wait_then_start(port, thenstart):
+def wait_for_port(port):
     write_stderr(f"Waiting for port {port}...")
     sleep(1)
+
+    if not port:
+        return
 
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -75,53 +75,70 @@ def wait_then_start(port, thenstart):
         sock.close()
 
         if result == 0:
-            start(thenstart)
+            return
         else:
-            wait_then_start(port, thenstart)
+            wait_for_port(port)
 
     except Exception as e:
-        wait_then_start(port, thenstart)
+        wait_for_port(port)
+
+def wait_then_start(port, thenstart):
+    wait_for_port(port)
+    start(thenstart)
 
 def wait_then_stop(port, thenstop):
-    write_stderr(f"Waiting for port {port}...")
-    sleep(1)
-
-    try:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        result = sock.connect_ex(('127.0.0.1', port))
-        sock.close()
-
-        if result == 0:
-            stop(thenstop)
-        else:
-            wait_then_stop(port, thenstop)
-
-    except Exception as e:
-        wait_then_stop(port, thenstop)
+    wait_for_port(port)
+    stop(thenstop)
 
 
 def open_port(port):
+    if not port:
+        return
+
     codespace_name = os.getenv("CODESPACE_NAME")
-    if codespace_name:
-        write_stderr(f"Opening port {port} for {codespace_name}")
-        subprocess.run(["gh", "codespace", "ports", "visibility", "-c", codespace_name, f"{port}:public"])
+    if not codespace_name:
+        return
+
+    write_stderr(f"Opening port {port} for {codespace_name}")
+    os.system(f"gh codespace ports visibility -c {codespace_name} {port}:public")
 
 
 def set_aws_config(port):
+    if not port:
+        os.system(f"aws configure set default.endpoint_url \"\"")
+        return
+
     codespace_name = os.getenv("CODESPACE_NAME")
+    if not codespace_name:
+        return
+
     domain = os.getenv("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN")
-    if codespace_name and domain:
-        subprocess.run(["aws", "configure", "set", "default.endpoint_url", f"https://{codespace_name}-{port}.{domain}"])
+    if not domain:
+        return
+
+    endpoint_url = f"https://{codespace_name}-{port}.{domain}"
+    write_stderr(f"Setting default AWS endpoint to for {endpoint_url}")
+    os.system(f"aws configure set default.endpoint_url {endpoint_url}")
 
 
 def load_localstack_pod():
-    if not os.path.exists(os.getenv("POD_PATH")):
+    pod_path = os.getenv("POD_PATH")
+
+    if not pod_path or not os.path.exists(pod_path):
         return
     
-    write_stderr("Restoring localstack state")
-    os.system(f"/root/.local/bin/localstack pod load file://{os.getenv('POD_PATH')}")
+    write_stderr("NOT IMPLEMENTED: Restoring localstack state")
+
+def save_localstack_pod():
+    pod_path = os.getenv("POD_PATH")
+
+    if not pod_path or not os.path.exists(pod_path):
+        return
+
+    write_stderr("NOT IMPLEMENTED: Saving localstack state")
 
 def main():
+    localstack_port = os.getenv("LOCALSTACK_PORT", None)
 
     while True:
         headers, body = listener.wait(sys.stdin, sys.stdout)
@@ -133,21 +150,22 @@ def main():
         write_stderr(f"Received {eventname} from {processname}.")
 
         if eventname == "PROCESS_STATE_RUNNING":
-            if processname == "dnsmasq":
-                wait_then_start(5353, "dind") 
-            if processname == "dind":
-                wait_then_start(2375, "localstack")
             if processname == "localstack":
-                open_port(4566)
-                set_aws_config(4566)
-                wait_then_stop(4566, "startup")
+                wait_for_port(localstack_port)
+                open_port(localstack_port)
+                set_aws_config(localstack_port)
+                load_localstack_pod()
+
+        if eventname == "PROCESS_STATE_STOPPING":
+            if processname == "localstack":
+                save_localstack_pod()
+
+        if eventname == "PROCESS_STATE_STOPPED":
+            if processname == "localstack":
+                set_aws_config(None)
 
         # acknowledge the event
         write_stdout("RESULT 2\nOK")
-
-        if eventname == "PROCESS_STATE_STOPPED" and processname == "startup":
-            # load_localstack_pod()
-            write_stderr(f"All services started!")
 
 
 if __name__ == '__main__':
