@@ -186,12 +186,12 @@ def main():
 
         if eventname == "PROCESS_STATE_STARTING":
             if processname == "localstack":
-                open_port(localstack_port)
                 set_aws_config(localstack_port)
 
         if eventname == "PROCESS_STATE_RUNNING":
             if processname == "localstack":
                 wait_for_port(localstack_port)
+                open_port(localstack_port)
                 load_localstack_pod()
 
         if eventname == "PROCESS_STATE_STOPPING":
