@@ -60,7 +60,7 @@ supervisor = SupervisorClient()
 def get_secret(key_name):
     env_secrets = '/workspaces/.codespaces/shared/.env-secrets'
 
-    if not os.path.exists(pod_path):
+    if not os.path.exists(env_secrets):
         write_stderr(f"Waiting for {env_secrets} to exist...")
         sleep(1)
         return get_secret(key_name)
