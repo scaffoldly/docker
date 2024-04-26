@@ -112,16 +112,14 @@ def wait_for_port(port):
     except Exception as e:
         wait_for_port(port)
 
-def wait_then_start(port, thenstart):
-    wait_for_port(port)
-    start(thenstart)
+def wait_for_codespaces_port(port, max_attempts = 60):
+    write_stderr(f"Waiting for codespaces port {port}...")
+    sleep(1)
 
-def wait_then_stop(port, thenstop):
-    wait_for_port(port)
-    stop(thenstop)
+    if max_attempts < 0:
+        write_stderr(f"Gave up looking for codespaces port '{port}'!")
+        return
 
-
-def open_port(port):
     if not port:
         return
 
@@ -133,9 +131,62 @@ def open_port(port):
     if not github_token:
         return
 
+    try:
+        # TODO Switch to API calls
+        result = subprocess.run("gh", "codespace", "ports", "-c", codespace_name, "--json", "sourcePort", env={'GH_TOKEN':github_token}, check=True, text=True, capture_output=True)
+        json_data = json.loads(result.stdout)
+        count = sum(1 for item in json_data if item.get('sourcePort') == int(port))
+        if count == 0:
+            return
+        else:
+            wait_for_codespaces_port(port, max_attempts - 1)
+
+    except Exception as e:
+        wait_for_codespaces_port(port)
+
+
+def wait_then_start(port, thenstart):
+    wait_for_port(port)
+    start(thenstart)
+
+def wait_then_stop(port, thenstop):
+    wait_for_port(port)
+    stop(thenstop)
+
+
+def open_port(port, max_attempts = 60):
+    if max_attempts < 0:
+        write_stderr(f"Gave up opening codespaces port '{port}'!")
+        return
+
+    if not port:
+        return
+
+    codespace_name = get_secret("CODESPACE_NAME")
+    if not codespace_name:
+        return
+
+    github_token = get_secret("GITHUB_TOKEN")
+    if not github_token:
+        return
+
+    write_stderr(f"Waiting for codespaces port {port}...")
+    sleep(1)
+
+    try:
+        # TODO Switch to API calls
+        result = subprocess.run("gh", "codespace", "ports", "-c", codespace_name, "--json", "sourcePort", env={'GH_TOKEN':github_token}, check=True, text=True, capture_output=True)
+        json_data = json.loads(result.stdout)
+        count = sum(1 for item in json_data if item.get('sourcePort') == int(port))
+        if count == 0:
+            raise Exception("Port not found")
+    except Exception as e:
+        open_port(port, max_attempts-1)
+        return
+
     write_stderr(f"Opening port {port} for {codespace_name}")
+    # TODO Switch to API calls
     output = subprocess.run(["gh", "codespace", "ports", "visibility", "-c", codespace_name, f"{port}:public"], env={'GH_TOKEN':github_token})
-    write_stderr(f"!!! output: {output}")
 
 
 def set_aws_config(port):
