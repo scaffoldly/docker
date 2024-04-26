@@ -139,19 +139,19 @@ def open_port(port, max_attempts = 60):
     if not github_token:
         return
 
-    write_stderr(f"Waiting for codespaces port {port}...")
-    sleep(1)
-
     try:
         # TODO Switch to API calls
-        result = subprocess.run(["gh", "codespace", "ports", "-c", codespace_name, "--json", "sourcePort"], env={'GH_TOKEN':github_token}, check=True, text=True, capture_output=True)
+        result = subprocess.run(["gh", "codespace", "ports", "-c", codespace_name, "--json", "sourcePort,visibility"], env={'GH_TOKEN':github_token}, check=True, text=True, capture_output=True)
         json_data = json.loads(result.stdout)
-        count = sum(1 for item in json_data if item.get('sourcePort') == int(port))
-        if count == 0:
+        item = next((item for item in json_data if item['sourcePort'] == int(port)), None)
+        if not item:
             raise Exception("Port not found")
+        if item.get("visibility") == "public":
+            return
     except Exception as e:
-        open_port(port, max_attempts-1)
-        return
+        write_stderr(f"Waiting for codespaces port {port}...")
+        sleep(1)
+        return open_port(port, max_attempts-1)
 
     write_stderr(f"Opening port {port} for {codespace_name}")
     # TODO Switch to API calls
@@ -194,15 +194,22 @@ def save_localstack_pod():
 
 def main():
     localstack_port = os.getenv("LOCALSTACK_PORT", None)
+    localstack_running = False
 
     while True:
         headers, body = listener.wait(sys.stdin, sys.stdout)
         body = dict([pair.split(":") for pair in body.split(" ")])
 
         eventname = headers["eventname"]
-        processname = body["processname"]
+        processname = body["processname"] if "processname" in body else "supervisor"
 
         write_stderr(f"Received {eventname} from {processname}.")
+
+        if eventname == "TICK_5":
+            if localstack_running:
+                # HACK: Startup ordering:
+                #       - it appears that the port flips back to private sometime in the startup process
+                open_port(localstack_port)
 
         if eventname == "PROCESS_STATE_STARTING":
             if processname == "localstack":
@@ -213,9 +220,11 @@ def main():
                 wait_for_port(localstack_port)
                 open_port(localstack_port)
                 load_localstack_pod()
+                localstack_running = True
 
         if eventname == "PROCESS_STATE_STOPPING":
             if processname == "localstack":
+                localstack_running = False
                 save_localstack_pod()
 
         if eventname == "PROCESS_STATE_STOPPED":
