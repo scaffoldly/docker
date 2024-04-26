@@ -81,4 +81,4 @@ else
 fi
 
 # Start docker/moby engine
-dockerd $CUSTOMDNS $DEFAULT_ADDRESS_POOL -H unix:///var/run/docker.sock -H tcp://0.0.0.0:2375 2>&1
+exec dockerd $CUSTOMDNS $DEFAULT_ADDRESS_POOL --tlsverify=false -H unix:///var/run/docker.sock -H tcp://0.0.0.0:2375 2>&1
