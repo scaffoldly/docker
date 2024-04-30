@@ -34,6 +34,7 @@ jobs:
               LOCALSTACK_MAJOR=3
               LOCALSTACK_MINOR=1
               LOCALSTACK_PATCH=0
+              NPM_MAJOR=9
           - name: aws-localstack
             context: devcontainer/aws/localstack
             tag: 3.1.0-node18

@@ -16,6 +16,8 @@ ARG LOCALSTACK_MINOR=1
 ENV LOCALSTACK_MINOR=${LOCALSTACK_MINOR}
 ARG LOCALSTACK_PATCH=0
 ENV LOCALSTACK_PATCH=${LOCALSTACK_PATCH}
+ARG NPM_MAJOR=latest
+ENV NPM_MAJOR=${NPM_MAJOR}
 
 # Repositories
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg && \
@@ -49,7 +51,7 @@ RUN add-apt-repository ppa:deadsnakes/ppa && \
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON_MAJOR}.${PYTHON_MINOR} 1
 
 # Node Core Tooling
-RUN npm install --global npm yarn nx
+RUN npm install --global npm@${NPM_MAJOR} yarn nx
 # Skipped: cdktf-cli
 
 # Python Core Tooling
