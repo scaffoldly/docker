@@ -28,9 +28,9 @@ jobs:
               BASE_IMAGE=jammy
           - name: aws-localstack
             context: devcontainer/aws/localstack
-            tag: 3.1.0-node20
+            tag: 3.1.0-node16
             args: |
-              NODE_MAJOR=20
+              NODE_MAJOR=16
               LOCALSTACK_MAJOR=3
               LOCALSTACK_MINOR=1
               LOCALSTACK_PATCH=0
@@ -39,6 +39,14 @@ jobs:
             tag: 3.1.0-node18
             args: |
               NODE_MAJOR=18
+              LOCALSTACK_MAJOR=3
+              LOCALSTACK_MINOR=1
+              LOCALSTACK_PATCH=0
+          - name: aws-localstack
+            context: devcontainer/aws/localstack
+            tag: 3.1.0-node20
+            args: |
+              NODE_MAJOR=20
               LOCALSTACK_MAJOR=3
               LOCALSTACK_MINOR=1
               LOCALSTACK_PATCH=0
