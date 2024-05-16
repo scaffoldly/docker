@@ -57,6 +57,15 @@ class SupervisorClient(object):
 
 supervisor = SupervisorClient()
 
+public_ports = []
+if os.path.exists('/etc/scaffoldly/public-ports'):
+    with open(file_path, 'r') as file:
+        public_ports = [port.strip() for port in file.readline().strip().split(',')]
+
+
+def is_public(port):
+    return str(port) in public_ports
+
 
 def get_secret(key_name, max_attempts = 60):
     env_secrets = '/workspaces/.codespaces/shared/.env-secrets'
@@ -93,30 +102,33 @@ def stop(process):
         write_stderr(f"WARN: Unable to stop: {e}")
 
 
-def wait_for_port(port):
-    write_stderr(f"Waiting for port {port}...")
-    sleep(1)
+def wait_for_port(port, max_attempts = 60):
+    if max_attempts <= 0:
+        return False
 
     if not port:
-        return
+        return False
 
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         result = sock.connect_ex(('127.0.0.1', int(port)))
         sock.close()
 
-        if result == 0:
-            return
-        else:
-            wait_for_port(port)
+        if result != 0:
+            raise Exception("Port is not open")
 
     except Exception as e:
-        wait_for_port(port)
+        write_stderr(f"Waiting for open port {port}...")
+        sleep(1)
+        return wait_for_port(port, max_attempts-1)
+
+    return True
 
 
 def wait_then_start(port, thenstart):
     wait_for_port(port)
     start(thenstart)
+
 
 def wait_then_stop(port, thenstop):
     wait_for_port(port)
@@ -124,20 +136,22 @@ def wait_then_stop(port, thenstop):
 
 
 def open_port(port, max_attempts = 60):
-    if max_attempts < 0:
-        write_stderr(f"Gave up opening codespaces port '{port}'!")
-        return
+    if not is_public(port):
+        return True
+
+    if max_attempts <= 0:
+        return False
 
     if not port:
-        return
+        return False
 
     codespace_name = get_secret("CODESPACE_NAME")
     if not codespace_name:
-        return
+        return False
 
     github_token = get_secret("GITHUB_TOKEN")
     if not github_token:
-        return
+        return False
 
     try:
         # TODO Switch to API calls
@@ -147,7 +161,7 @@ def open_port(port, max_attempts = 60):
         if not item:
             raise Exception("Port not found")
         if item.get("visibility") == "public":
-            return
+            return False
     except Exception as e:
         write_stderr(f"Waiting for codespaces port {port}...")
         sleep(1)
@@ -156,6 +170,8 @@ def open_port(port, max_attempts = 60):
     write_stderr(f"Opening port {port} for {codespace_name}")
     # TODO Switch to API calls
     output = subprocess.run(["gh", "codespace", "ports", "visibility", "-c", codespace_name, f"{port}:public"], env={'GH_TOKEN':github_token})
+
+    return True
 
 
 def set_aws_config(port):
@@ -184,6 +200,7 @@ def load_localstack_pod():
     
     write_stderr("NOT IMPLEMENTED: Restoring localstack state")
 
+
 def save_localstack_pod():
     pod_path = os.getenv("POD_PATH")
 
@@ -192,9 +209,21 @@ def save_localstack_pod():
 
     write_stderr("NOT IMPLEMENTED: Saving localstack state")
 
+
+def ensure_public_ports():
+    for port in public_ports:
+        if wait_for_port(port, 1):
+            if open_port(port, 1):
+                public_ports.remove(port)
+
+
 def main():
     localstack_port = os.getenv("LOCALSTACK_PORT", None)
     localstack_running = False
+
+    if localstack_port:
+        # Localstack port is handled by events, so remove it from the list
+        public_ports.remove(localstack_port)
 
     while True:
         headers, body = listener.wait(sys.stdin, sys.stdout)
@@ -206,6 +235,8 @@ def main():
         write_stderr(f"Received {eventname} from {processname}.")
 
         if eventname == "TICK_5":
+            ensure_public_ports()
+
             if localstack_running:
                 # HACK: Startup ordering:
                 #       - it appears that the port flips back to private sometime in the startup process
