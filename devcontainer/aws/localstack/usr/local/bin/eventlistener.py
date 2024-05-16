@@ -64,10 +64,6 @@ if os.path.exists(public_ports_path):
         public_ports = [port.strip() for port in file.readline().strip().split(',')]
 
 
-def is_public(port):
-    return str(port) in public_ports
-
-
 def get_secret(key_name, max_attempts = 60):
     env_secrets = '/workspaces/.codespaces/shared/.env-secrets'
 
@@ -119,7 +115,6 @@ def wait_for_port(port, max_attempts = 60):
             raise Exception("Port is not open")
 
     except Exception as e:
-        write_stderr(f"Waiting for open port {port}...")
         sleep(1)
         return wait_for_port(port, max_attempts-1)
 
@@ -137,9 +132,6 @@ def wait_then_stop(port, thenstop):
 
 
 def open_port(port, max_attempts = 60):
-    if not is_public(port):
-        return True
-
     if max_attempts <= 0:
         return False
 
@@ -164,7 +156,6 @@ def open_port(port, max_attempts = 60):
         if item.get("visibility") == "public":
             return False
     except Exception as e:
-        write_stderr(f"Waiting for codespaces port {port}...")
         sleep(1)
         return open_port(port, max_attempts-1)
 
@@ -211,20 +202,23 @@ def save_localstack_pod():
     write_stderr("NOT IMPLEMENTED: Saving localstack state")
 
 
-def ensure_public_ports():
+def ensure_public_ports(exclude=[]):
     for port in public_ports:
-        if wait_for_port(port, 1):
-            if open_port(port, 1):
-                public_ports.remove(port)
+        if port in exclude:
+            break
+
+        if not wait_for_port(port, 1):
+            break
+        
+        if not open_port(port, 1):
+            break
+        
+        public_ports.remove(port)
 
 
 def main():
     localstack_port = os.getenv("LOCALSTACK_PORT", None)
     localstack_running = False
-
-    if localstack_port:
-        # Localstack port is handled by events, so remove it from the list
-        public_ports.remove(localstack_port)
 
     while True:
         headers, body = listener.wait(sys.stdin, sys.stdout)
@@ -236,7 +230,7 @@ def main():
         write_stderr(f"Received {eventname} from {processname}.")
 
         if eventname == "TICK_5":
-            ensure_public_ports()
+            ensure_public_ports(exclude=[localstack_port])
 
             if localstack_running:
                 # HACK: Startup ordering:
