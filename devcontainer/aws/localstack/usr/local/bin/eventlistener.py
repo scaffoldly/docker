@@ -57,9 +57,10 @@ class SupervisorClient(object):
 
 supervisor = SupervisorClient()
 
+public_ports_path = '/etc/scaffoldly/public-ports'
 public_ports = []
-if os.path.exists('/etc/scaffoldly/public-ports'):
-    with open(file_path, 'r') as file:
+if os.path.exists(public_ports_path):
+    with open(public_ports_path, 'r') as file:
         public_ports = [port.strip() for port in file.readline().strip().split(',')]
 
 
