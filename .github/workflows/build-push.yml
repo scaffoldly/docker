@@ -73,15 +73,17 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
+          flavor: |
+            prefix=${{ matrix.tag }}
           images: |
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.name }}
             ghcr.io/${{ github.repository_owner }}/${{ matrix.name }}
           tags: |
             type=raw,value=${{ matrix.tag }},enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
-            type=raw,value=${{ matrix.tag }}-${{ github.sha }}
-            type=raw,value=${{ matrix.tag }}-{{date 'YYYYMMDD'}},enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
-            type=ref,event=pr,suffix=-${{ matrix.tag }}
-            type=schedule,pattern=${{ matrix.tag }}-{{date 'YYYYMMDD'}}
+            type=raw,value=${{ github.sha }}
+            type=raw,suffix={{date 'YYYYMMDD'}},enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
+            type=ref,event=pr
+            type=schedule,pattern={{date 'YYYYMMDD'}}
           labels: |
             maintainer=Scaffoldly <docker@scaffold.ly>
       - name: Build and push
