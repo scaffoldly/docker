@@ -29,6 +29,20 @@ ENV LOCALSTACK_PATCH=${LOCALSTACK_PATCH}
 ARG NPM_MAJOR=latest
 ENV NPM_MAJOR=${NPM_MAJOR}
 
+# Nix
+RUN arch=$(dpkg --print-architecture) && \
+    if [ "$arch" = "amd64" ]; then \
+        url=https://nix-community.github.io/nix-installers/x86_64/nix-multi-user-2.17.1.deb; \
+    elif [ "$arch" = "arm64" ]; then \
+        url=https://nix-community.github.io/nix-installers/aarch64/nix-multi-user-2.17.1.deb; \
+    else \
+        echo "Unsupported architecture: $arch"; \
+        exit 1; \
+    fi && \
+    curl -o /tmp/nix-multi-user.deb $url && \
+    dpkg -i /tmp/nix-multi-user.deb && \
+    rm /tmp/nix-multi-user.deb
+
 # Repositories
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg && \
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu jammy stable" > /etc/apt/sources.list.d/docker.list && \

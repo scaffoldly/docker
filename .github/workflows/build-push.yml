@@ -80,6 +80,7 @@ jobs:
             type=raw,value=${{ matrix.tag }},enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
             type=raw,value=${{ matrix.tag }}-${{ github.sha }}
             type=raw,value=${{ matrix.tag }}-{{date 'YYYYMMDD'}},enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
+            type=ref,event=pr,prefix-${{ matrix.tag }}-
             type=schedule,pattern=${{ matrix.tag }}-{{date 'YYYYMMDD'}}
           labels: |
             maintainer=Scaffoldly <docker@scaffold.ly>
