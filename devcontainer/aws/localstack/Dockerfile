@@ -85,13 +85,18 @@ RUN pip install --no-cache-dir pipx supervisor supervisor_checks amazon-kclpy
 ENV PATH="${PATH}:/root/.local/bin"
 
 # Linuxbrew
-WORKDIR /root
 ENV BREWHOME="/root"
 ENV BREWPATH="${BREWHOME}/.linuxbrew"
 ENV PATH="${PATH}:${BREWPATH}/bin:${BREWPATH}/sbin"
 ENV XDG_CACHE_HOME="${BREWHOME}/.cache"
 ENV BREWGIT="${BREWPATH}/Homebrew"
-RUN git clone https://github.com/Homebrew/brew.git --depth=1 --branch "${HOMEBREW_MAJOR}.${HOMEBREW_MINOR}.${HOMEBREW_PATCH}" ${BREWGIT}
+ENV HOMEBREW_NO_ANALYTICS=1
+ENV HOMEBREW_NO_AUTO_UPDATE=1
+
+RUN git clone https://github.com/Homebrew/brew.git --depth=1 ${BREWGIT}
+RUN git -C ${BREWGIT} fetch --depth 1 origin tag ${HOMEBREW_MAJOR}.${HOMEBREW_MINOR}.${HOMEBREW_PATCH}
+RUN git -C ${BREWGIT} checkout tags/${HOMEBREW_MAJOR}.${HOMEBREW_MINOR}.${HOMEBREW_PATCH}
+
 RUN mkdir -p \
   ${BREWPATH}/bin \
   ${BREWPATH}/etc \
@@ -109,7 +114,7 @@ RUN mkdir -p \
 #   && brew install-bundler-gems --groups=all \
 #   && brew cleanup \
 #   && rm -rf ${XDG_CACHE_HOME}
-WORKDIR /
+# WORKDIR /
 
 # AWS
 RUN pipx install awscli
