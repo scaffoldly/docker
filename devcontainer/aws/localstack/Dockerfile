@@ -10,6 +10,16 @@ ARG PYTHON_MAJOR=3
 ENV PYTHON_MAJOR=${PYTHON_MAJOR}
 ARG PYTHON_MINOR=10
 ENV PYTHON_MINOR=${PYTHON_MINOR}
+ARG RUBY_MAJOR=3
+ENV RUBY_MAJOR=${RUBY_MAJOR}
+ARG RUBY_MINOR=1
+ENV RUBY_MINOR=${RUBY_MINOR}
+ARG HOMEBREW_MAJOR=4
+ENV HOMEBREW_MAJOR=${HOMEBREW_MAJOR}
+ARG HOMEBREW_MINOR=3
+ENV HOMEBREW_MINOR=${HOMEBREW_MINOR}
+ARG HOMEBREW_PATCH=0
+ENV HOMEBREW_PATCH=${HOMEBREW_PATCH}
 ARG LOCALSTACK_MAJOR=3
 ENV LOCALSTACK_MAJOR=${LOCALSTACK_MAJOR}
 ARG LOCALSTACK_MINOR=1
@@ -48,26 +58,70 @@ RUN apt-get update && \
     gh \
     && rm -rf /var/lib/apt/lists/*
 
+# Python Core Tooling
 RUN add-apt-repository ppa:deadsnakes/ppa && \
     apt-get update && \
     apt-get install -y \
     python${PYTHON_MAJOR}.${PYTHON_MINOR} python${PYTHON_MAJOR}.${PYTHON_MINOR}-dev python${PYTHON_MAJOR}.${PYTHON_MINOR}-venv \
     && rm -rf /var/lib/apt/lists/*
 
-# Primary Versions
+# Default Versions
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON_MAJOR}.${PYTHON_MINOR} 1
 
-# Node Core Tooling
+# Ruby Core Tooling
+RUN sudo add-apt-repository ppa:instructure/ruby && \
+    apt-get update && \
+    apt-get install -y \
+    ruby${RUBY_MAJOR}.${RUBY_MINOR} ruby${RUBY_MAJOR}.${RUBY_MINOR}-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Node Tools
 RUN npm install --global npm@${NPM_MAJOR} yarn nx
 # Skipped: cdktf-cli
 
-# Python Core Tooling
+# Python Tools
 RUN curl -fsSL https://bootstrap.pypa.io/get-pip.py | python
 RUN pip install --no-cache-dir pipx supervisor supervisor_checks amazon-kclpy
 ENV PATH="${PATH}:/root/.local/bin"
-RUN pipx install awscli 
+
+# Linuxbrew
+ENV BREWHOME="/root"
+ENV BREWPATH="${BREWHOME}/.linuxbrew"
+ENV PATH="${PATH}:${BREWPATH}/bin:${BREWPATH}/sbin"
+ENV XDG_CACHE_HOME="${BREWHOME}/.cache"
+ENV BREWGIT="${BREWPATH}/Homebrew"
+ENV HOMEBREW_NO_ANALYTICS=1
+ENV HOMEBREW_NO_AUTO_UPDATE=1
+
+RUN git clone https://github.com/Homebrew/brew.git --depth=1 ${BREWGIT}
+RUN git -C ${BREWGIT} fetch --depth 1 origin tag ${HOMEBREW_MAJOR}.${HOMEBREW_MINOR}.${HOMEBREW_PATCH}
+RUN git -C ${BREWGIT} checkout tags/${HOMEBREW_MAJOR}.${HOMEBREW_MINOR}.${HOMEBREW_PATCH}
+
+RUN mkdir -p \
+  ${BREWPATH}/bin \
+  ${BREWPATH}/etc \
+  ${BREWPATH}/include \
+  ${BREWPATH}/lib \
+  ${BREWPATH}/opt \
+  ${BREWPATH}/sbin \
+  ${BREWPATH}/share \
+  ${BREWPATH}/var/homebrew/linked \
+  ${BREWPATH}/Cellar \
+  && ln -s ${BREWGIT}/bin/brew ${BREWPATH}/bin/brew
+
+# RUN HOMEBREW_NO_ANALYTICS=1 HOMEBREW_NO_AUTO_UPDATE=1 brew tap --force homebrew/core \
+#   && gem install bundler -n /usr/bin \
+#   && brew install-bundler-gems --groups=all \
+#   && brew cleanup \
+#   && rm -rf ${XDG_CACHE_HOME}
+# WORKDIR /
+
+# AWS
+RUN pipx install awscli
 RUN pipx install awscliv2
-RUN pipx install awscli-local 
+RUN pipx install awscli-local
+
+# Localstack
 RUN pipx install --include-deps localstack[full]==${LOCALSTACK_MAJOR}.${LOCALSTACK_MINOR}.${LOCALSTACK_PATCH}
 
 COPY root /root
