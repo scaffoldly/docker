@@ -104,13 +104,11 @@ RUN mkdir -p \
   ${BREWPATH}/Cellar \
   && ln -s ${BREWGIT}/bin/brew ${BREWPATH}/bin/brew
 
-RUN HOMEBREW_NO_ANALYTICS=1 HOMEBREW_NO_AUTO_UPDATE=1 brew tap --force homebrew/core \
-  && gem install bundler -n /usr/bin \
-  && brew install-bundler-gems --groups=all \
-  && brew cleanup \
-  && { git -C ${BREWGIT} config --unset gc.auto; true; } \
-  && { git -C ${BREWGIT} config --unset homebrew.devcmdrun; true; } \
-  && rm -rf ${XDG_CACHE_HOME}
+# RUN HOMEBREW_NO_ANALYTICS=1 HOMEBREW_NO_AUTO_UPDATE=1 brew tap --force homebrew/core \
+#   && gem install bundler -n /usr/bin \
+#   && brew install-bundler-gems --groups=all \
+#   && brew cleanup \
+#   && rm -rf ${XDG_CACHE_HOME}
 WORKDIR /
 
 # AWS
