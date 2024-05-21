@@ -67,7 +67,7 @@ if os.path.exists(public_ports_path):
 def get_secret(key_name):
     env_secrets = '/workspaces/.codespaces/shared/.env-secrets'
 
-    if not os.path.exists(env_secrets):
+    if os.path.exists(env_secrets):
         with open(env_secrets, 'r') as file:
             for line in file:
                 if line.startswith(f"{key_name}="):
