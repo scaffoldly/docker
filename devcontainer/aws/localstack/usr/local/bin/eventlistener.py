@@ -64,17 +64,8 @@ if os.path.exists(public_ports_path):
         public_ports = [port.strip() for port in file.readline().strip().split(',')]
 
 
-def get_secret(key_name, max_attempts = 60):
+def get_secret(key_name):
     env_secrets = '/workspaces/.codespaces/shared/.env-secrets'
-
-    if max_attempts < 0:
-        write_stderr(f"Gave up looking for '{key_name}' from '{env_secrets}'!")
-        return None
-
-    if not os.path.exists(env_secrets):
-        write_stderr(f"Waiting for '{env_secrets}' to exist...")
-        sleep(1)
-        return get_secret(key_name, max_attempts - 1)
 
     with open(env_secrets, 'r') as file:
         for line in file:
@@ -83,7 +74,8 @@ def get_secret(key_name, max_attempts = 60):
                 _, encoded_value = line.strip().split('=', 1)
                 return decode_base64(encoded_value)
 
-    return None
+    # Fallback to env, default None
+    return os.environ.get(key_name, None)
 
 
 def start(process):
