@@ -171,15 +171,14 @@ def set_aws_config(port):
         os.system(f"aws configure set default.endpoint_url \"\"")
         return
 
+    endpoint_url = f"http://localhost.localstack.cloud:{port}"
+
     codespace_name = get_secret("CODESPACE_NAME")
-    if not codespace_name:
-        return
-
     domain = get_secret("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN")
-    if not domain:
-        return
 
-    endpoint_url = f"https://{codespace_name}-{port}.{domain}"
+    if codespace_name and domain:
+        endpoint_url = f"https://{codespace_name}-{port}.{domain}"
+
     write_stderr(f"Setting default AWS endpoint to for {endpoint_url}")
     os.system(f"aws configure set default.endpoint_url {endpoint_url}")
 
