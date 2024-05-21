@@ -67,12 +67,13 @@ if os.path.exists(public_ports_path):
 def get_secret(key_name):
     env_secrets = '/workspaces/.codespaces/shared/.env-secrets'
 
-    with open(env_secrets, 'r') as file:
-        for line in file:
-            if line.startswith(f"{key_name}="):
-                # Split the line at '=' and strip any whitespace or newlines
-                _, encoded_value = line.strip().split('=', 1)
-                return decode_base64(encoded_value)
+    if not os.path.exists(env_secrets):
+        with open(env_secrets, 'r') as file:
+            for line in file:
+                if line.startswith(f"{key_name}="):
+                    # Split the line at '=' and strip any whitespace or newlines
+                    _, encoded_value = line.strip().split('=', 1)
+                    return decode_base64(encoded_value)
 
     # Fallback to env, default None
     return os.environ.get(key_name, None)
