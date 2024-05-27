@@ -166,7 +166,7 @@ jobs:
             557208059266.dkr.ecr.us-east-1.amazonaws.com/${{ matrix.name }}
             public.ecr.aws/${{ github.repository_owner }}/${{ matrix.name }}
           tags: |
-            type=raw,value=${{ matrix.tag }}
+            type=raw,value=${{ matrix.tag }},enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
             type=raw,value=${{ matrix.tag }}-${{ github.sha }}
             type=raw,value=${{ matrix.tag }}-{{date 'YYYYMMDD'}},enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
             type=schedule,pattern=${{ matrix.tag }}-{{date 'YYYYMMDD'}}
