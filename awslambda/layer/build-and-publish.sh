@@ -17,7 +17,7 @@ docker rm -f $NAME
 
 # Create a zip file
 cd /tmp/layer
-zip -r /tmp/layer.zip .
+zip -9 -r /tmp/layer.zip .
 
 # Convert ARCH to x86_64 or arm64
 if [ $ARCH == "linux/arm64" ]; then
