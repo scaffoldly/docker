@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -euo pipefail
+set -x
+
 NAME=$1
 IMAGE=$2
 ARCH=$3
@@ -8,9 +11,9 @@ ARCH=$3
 mkdir -p /tmp/layer
 
 docker pull $IMAGE
-docker create --platform $ARCH --name extract $IMAGE
-docker cp extract:/opt /tmp/layer
-docker rm -f extract
+docker create --platform $ARCH --name $NAME $IMAGE
+docker cp $NAME:/opt /tmp/layer
+docker rm -f $NAME
 
 # Create a zip file
 cd /tmp/layer
