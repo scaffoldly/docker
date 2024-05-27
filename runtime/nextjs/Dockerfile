@@ -8,7 +8,7 @@ ENV NEXT_MAJOR=${NEXT_MAJOR}
 
 WORKDIR /opt
 
-RUN npm install -g --prefix . next@${NEXT_MAJOR}
+RUN npm install -g --include prod --prefix . next@${NEXT_MAJOR}
 
 RUN node --version
 RUN next --version
