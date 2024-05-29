@@ -141,7 +141,6 @@ ENV OVERRIDE_IN_DOCKER=1
 ENV AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE=1
 
 # Lambda Env
-ENV PATH="/opt/bin:${PATH}"
 RUN ARCH=$(uname -m) && \
     if [ "$ARCH" = "x86_64" ]; then \
         curl -Lo /usr/local/bin/aws-lambda-rie https://github.com/aws/aws-lambda-runtime-interface-emulator/releases/download/v1.19/aws-lambda-rie; \
@@ -151,7 +150,7 @@ RUN ARCH=$(uname -m) && \
         echo "Unsupported architecture: $ARCH" && exit 1; \
     fi && \
     chmod +x /usr/local/bin/aws-lambda-rie
-RUN npm install -g --prefix /opt /opt/packages/awslambda-bootstrap
+RUN npm install -g @scaffoldly/awslambda-bootstrap
 RUN ln -s /var/runtime/bootstrap $(which bootstrap)
 RUN /var/runtime/bootstrap --version
 
