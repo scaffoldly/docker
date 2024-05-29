@@ -127,7 +127,9 @@ RUN pipx install --include-deps localstack[full]==${LOCALSTACK_MAJOR}.${LOCALSTA
 COPY root /root
 COPY bin /bin
 COPY etc /etc
+COPY opt /opt
 COPY usr /usr
+COPY var /var
 
 # Localstack Env
 ENV ACTIVATE_PRO=0
@@ -150,8 +152,8 @@ RUN ARCH=$(uname -m) && \
     fi && \
     chmod +x /usr/local/bin/aws-lambda-rie
 RUN npm install -g @scaffoldly/awslambda-bootstrap
-# RUN ln -s $(which bootstrap) /var/runtime/bootstrap
-# RUN /var/runtime/bootstrap --version
+RUN ln -s $(which bootstrap) /var/runtime/bootstrap
+RUN /var/runtime/bootstrap --version
 
 # Runtime Env
 ENV STAGE="local"
