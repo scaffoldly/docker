@@ -1,0 +1,33 @@
+{
+  "name": "awslambda-bootstrap",
+  "version": "0.1.0",
+  "description": "Bootstrap Script for AWS Lambda",
+  "repository": "https://github.com/scaffoldly/docker",
+  "author": "scaffold.ly",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "bin": {
+    "bootstrap": "cli/index.cjs"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node -r ts-node/register -r tsconfig-paths/register src/index.ts",
+    "postinstall": "tsc"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@types/aws-lambda": "^8.10.138",
+    "@types/node": "18",
+    "@types/which": "^3.0.3",
+    "aws-lambda": "^1.0.7",
+    "axios": "^1.7.2",
+    "typescript": "5",
+    "which": "^4.0.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0"
+  }
+}

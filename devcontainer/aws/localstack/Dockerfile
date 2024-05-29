@@ -127,6 +127,7 @@ RUN pipx install --include-deps localstack[full]==${LOCALSTACK_MAJOR}.${LOCALSTA
 COPY root /root
 COPY bin /bin
 COPY etc /etc
+COPY opt /opt
 COPY usr /usr
 
 # Localstack Env
@@ -138,6 +139,20 @@ ENV OVERRIDE_IN_DOCKER=1
 
 # AWS Env
 ENV AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE=1
+
+# Lambda Env
+RUN ARCH=$(uname -m) && \
+    if [ "$ARCH" = "x86_64" ]; then \
+        curl -Lo /usr/local/bin/aws-lambda-rie https://github.com/aws/aws-lambda-runtime-interface-emulator/releases/download/v1.19/aws-lambda-rie; \
+    elif [ "$ARCH" = "aarch64" ]; then \
+        curl -Lo /usr/local/bin/aws-lambda-rie https://github.com/aws/aws-lambda-runtime-interface-emulator/releases/download/v1.19/aws-lambda-rie-arm64; \
+    else \
+        echo "Unsupported architecture: $ARCH" && exit 1; \
+    fi && \
+    chmod +x /usr/local/bin/aws-lambda-rie
+RUN npm install -g /opt/packages/awslambda-bootstrap
+RUN ln -s /var/runtime/bootstrap $(which bootstrap)
+RUN /var/runtime/bootstrap --version
 
 # Runtime Env
 ENV STAGE="local"
