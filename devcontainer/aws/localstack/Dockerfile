@@ -127,7 +127,6 @@ RUN pipx install --include-deps localstack[full]==${LOCALSTACK_MAJOR}.${LOCALSTA
 COPY root /root
 COPY bin /bin
 COPY etc /etc
-COPY opt /opt
 COPY usr /usr
 
 # Localstack Env
