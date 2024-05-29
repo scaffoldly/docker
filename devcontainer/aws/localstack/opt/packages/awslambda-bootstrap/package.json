@@ -10,9 +10,9 @@
     "bootstrap": "cli/index.cjs"
   },
   "scripts": {
-    "compile": "tsc",
+    "build": "yarn install",
     "start": "node -r ts-node/register -r tsconfig-paths/register src/index.ts",
-    "postinstall": "yarn compile"
+    "postinstall": "tsc"
   },
   "engines": {
     "node": ">=18"
