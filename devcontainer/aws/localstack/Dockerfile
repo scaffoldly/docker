@@ -142,7 +142,7 @@ ENV OVERRIDE_IN_DOCKER=1
 ENV AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE=1
 
 # Lambda Env
-RUN ENV PATH="/var/runtime:/var/task:${PATH}"
+ENV PATH="/var/runtime:/var/task:${PATH}"
 RUN ARCH=$(uname -m) && \
     if [ "$ARCH" = "x86_64" ]; then \
         curl -Lo /usr/local/bin/aws-lambda-rie https://github.com/aws/aws-lambda-runtime-interface-emulator/releases/download/v1.19/aws-lambda-rie; \
