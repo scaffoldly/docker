@@ -152,9 +152,6 @@ RUN ARCH=$(uname -m) && \
         echo "Unsupported architecture: $ARCH" && exit 1; \
     fi && \
     chmod +x /usr/local/bin/aws-lambda-rie
-RUN npm install -g @scaffoldly/awslambda-bootstrap
-RUN ln -s $(which bootstrap) /var/runtime/bootstrap
-RUN /var/runtime/bootstrap --version
 
 # Runtime Env
 ENV STAGE="local"
