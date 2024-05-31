@@ -160,3 +160,4 @@ ENV LOCALSTACK="true"
 
 # Entrypoints
 COPY ./entrypoints /
+RUN chmod +x /entrypoints/*
