@@ -152,12 +152,11 @@ RUN ARCH=$(uname -m) && \
         echo "Unsupported architecture: $ARCH" && exit 1; \
     fi && \
     chmod +x /usr/local/bin/aws-lambda-rie
-# Entrypoints
-COPY ./_entrypoints /
 
 # Runtime Env
 ENV STAGE="local"
 ENV LOCALSTACK="true"
 # ENV POD_PATH="/var/lib/localstack/pod"
 
-
+# Root FS
+COPY ./_root /
