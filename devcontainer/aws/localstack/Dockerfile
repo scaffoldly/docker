@@ -60,14 +60,22 @@ RUN curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xF23C5A6C
     curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null && \
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" > /etc/apt/sources.list.d/github-cli.list
 
+# Dev Tools
 RUN nanolayer install apt "gh supervisor dnsutils netcat-openbsd"
+# Docker
 RUN nanolayer install apt "docker-ce docker-ce-cli containerd.io docker-compose-plugin docker-ce-rootless-extras docker-buildx-plugin"
+# Dev Bindings
 RUN nanolayer install apt "libsasl2-dev libsnappy-dev"
+# Node
 RUN nanolayer install apt "nodejs"
-RUN nanolayer install apt "python${PYTHON_MAJOR}.${PYTHON_MINOR} python${PYTHON_MAJOR}.${PYTHON_MINOR}-dev python${PYTHON_MAJOR}.${PYTHON_MINOR}-venv"
+# Python
+RUN nanolayer install apt "python${PYTHON_MAJOR}.${PYTHON_MINOR} python${PYTHON_MAJOR}.${PYTHON_MINOR}-dev python${PYTHON_MAJOR}.${PYTHON_MINOR}-venv" && \
+    update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON_MAJOR}.${PYTHON_MINOR} 1 && \
+    curl -fsSL https://bootstrap.pypa.io/get-pip.py | python
+# Java
 RUN nanolayer install apt "openjdk-${JAVA_MAJOR}-jdk openjdk-${JAVA_MAJOR}-jre"
+# Ruby
 RUN nanolayer install apt "ruby${RUBY_MAJOR}.${RUBY_MINOR} ruby${RUBY_MAJOR}.${RUBY_MINOR}-dev"
-RUN curl -fsSL https://bootstrap.pypa.io/get-pip.py | python
 
 # # Nvidia Repository (Ref: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
 # RUN curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
