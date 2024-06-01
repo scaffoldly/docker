@@ -63,6 +63,7 @@ RUN nanolayer install apt "docker-ce docker-ce-cli containerd.io docker-compose-
 RUN nanolayer install apt "libsasl2-dev libsnappy-dev"
 RUN nanolayer install apt "nodejs"
 RUN nanolayer install apt "python${PYTHON_MAJOR}.${PYTHON_MINOR} python${PYTHON_MAJOR}.${PYTHON_MINOR}-dev python${PYTHON_MAJOR}.${PYTHON_MINOR}-venv"
+RUN nanolayer install apt "openjdk-${JAVA_MAJOR}-jdk openjdk-${JAVA_MAJOR}-jre"
 
 # # Nvidia Repository (Ref: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
 # RUN curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
