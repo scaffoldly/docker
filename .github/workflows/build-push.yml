@@ -26,31 +26,31 @@ jobs:
             tag: latest
             args: |
               BASE_IMAGE=noble
-          - name: aws-localstack
-            context: devcontainer/aws/localstack
-            tag: 3.1.0-node16
-            args: |
-              NODE_MAJOR=16
-              LOCALSTACK_MAJOR=3
-              LOCALSTACK_MINOR=1
-              LOCALSTACK_PATCH=0
-              NPM_MAJOR=9
-          - name: aws-localstack
-            context: devcontainer/aws/localstack
-            tag: 3.1.0-node18
-            args: |
-              NODE_MAJOR=18
-              LOCALSTACK_MAJOR=3
-              LOCALSTACK_MINOR=1
-              LOCALSTACK_PATCH=0
-          - name: aws-localstack
-            context: devcontainer/aws/localstack
-            tag: 3.1.0-node20
-            args: |
-              NODE_MAJOR=20
-              LOCALSTACK_MAJOR=3
-              LOCALSTACK_MINOR=1
-              LOCALSTACK_PATCH=0
+          # - name: aws-localstack
+          #   context: devcontainer/aws/localstack
+          #   tag: 3.1.0-node16
+          #   args: |
+          #     NODE_MAJOR=16
+          #     LOCALSTACK_MAJOR=3
+          #     LOCALSTACK_MINOR=1
+          #     LOCALSTACK_PATCH=0
+          #     NPM_MAJOR=9
+          # - name: aws-localstack
+          #   context: devcontainer/aws/localstack
+          #   tag: 3.1.0-node18
+          #   args: |
+          #     NODE_MAJOR=18
+          #     LOCALSTACK_MAJOR=3
+          #     LOCALSTACK_MINOR=1
+          #     LOCALSTACK_PATCH=0
+          # - name: aws-localstack
+          #   context: devcontainer/aws/localstack
+          #   tag: 3.1.0-node20
+          #   args: |
+          #     NODE_MAJOR=20
+          #     LOCALSTACK_MAJOR=3
+          #     LOCALSTACK_MINOR=1
+          #     LOCALSTACK_PATCH=0
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -90,7 +90,8 @@ jobs:
           file: ${{ matrix.context }}/Dockerfile
           context: ${{ matrix.context }}
           build-args: ${{ matrix.args }}
-          platforms: linux/amd64,linux/arm64
+          # platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           pull: true
           push: true
           tags: ${{ steps.meta.outputs.tags }}
