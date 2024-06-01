@@ -25,7 +25,7 @@ jobs:
             context: devcontainer/aws/localstack
             tag: latest
             args: |
-              BASE_IMAGE=noble
+              BASE_IMAGE=jammy
           # - name: aws-localstack
           #   context: devcontainer/aws/localstack
           #   tag: 3.1.0-node16
