@@ -60,12 +60,14 @@ RUN curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xF23C5A6C
     curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null && \
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" > /etc/apt/sources.list.d/github-cli.list
 
-# Dev Tools
-RUN nanolayer install apt "gh dnsutils netcat-openbsd"
+# Generic Tools
+RUN nanolayer install apt "gh dnsutils netcat-openbsd make"
 # Docker
 RUN nanolayer install apt "docker-ce docker-ce-cli containerd.io docker-compose-plugin docker-ce-rootless-extras docker-buildx-plugin"
 # Dev Bindings
 RUN nanolayer install apt "libsasl2-dev libsnappy-dev"
+# C/C++
+RUN nanolayer install apt "gcc g++"
 # Node
 RUN nanolayer install apt "nodejs" && \
     npm install --only=production --global npm@${NPM_MAJOR} yarn nx pnpm && \
