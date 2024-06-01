@@ -61,13 +61,15 @@ RUN curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xF23C5A6C
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" > /etc/apt/sources.list.d/github-cli.list
 
 # Dev Tools
-RUN nanolayer install apt "gh supervisor dnsutils netcat-openbsd"
+RUN nanolayer install apt "gh dnsutils netcat-openbsd"
 # Docker
 RUN nanolayer install apt "docker-ce docker-ce-cli containerd.io docker-compose-plugin docker-ce-rootless-extras docker-buildx-plugin"
 # Dev Bindings
 RUN nanolayer install apt "libsasl2-dev libsnappy-dev"
 # Node
-RUN nanolayer install apt "nodejs"
+RUN nanolayer install apt "nodejs" && \
+    npm install --only=production --global npm@${NPM_MAJOR} yarn nx pnpm && \
+    npm cache clean --force
 # Python
 RUN nanolayer install apt "python${PYTHON_MAJOR}.${PYTHON_MINOR} python${PYTHON_MAJOR}.${PYTHON_MINOR}-dev python${PYTHON_MAJOR}.${PYTHON_MINOR}-venv" && \
     update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON_MAJOR}.${PYTHON_MINOR} 1 && \
