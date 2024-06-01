@@ -1,4 +1,19 @@
 ARG BASE_IMAGE=noble
+FROM ubuntu:${BASE_IMAGE} as ensure-bins
+
+RUN apt-get update &&
+    apt-get install curl
+
+RUN ARCH=$(uname -m) && \
+    if [ "$ARCH" = "x86_64" ]; then \
+        curl -sfL https://github.com/devcontainers-contrib/nanolayer/releases/download/v0.5.6/nanolayer-x86_64-unknown-linux-gnu.tgz | tar fxvz - -C /bin; \
+    elif [ "$ARCH" = "aarch64" ]; then \
+        curl -sfL https://github.com/devcontainers-contrib/nanolayer/releases/download/v0.5.6/nanolayer-aarch64-unknown-linux-gnu.tgz | tar fxvz - -C /bin; \
+    else \
+        echo "Unsupported architecture: $ARCH" && exit 1; \
+    fi && \
+    chmod +x /bin/nanolayer
+
 FROM ubuntu:${BASE_IMAGE}
 
 ENV BASE_IMAGE=${BASE_IMAGE}
@@ -29,15 +44,7 @@ ENV LOCALSTACK_PATCH=${LOCALSTACK_PATCH}
 ARG NPM_MAJOR=latest
 ENV NPM_MAJOR=${NPM_MAJOR}
 
-RUN ARCH=$(uname -m) && \
-    if [ "$ARCH" = "x86_64" ]; then \
-        curl -sfL https://github.com/devcontainers-contrib/nanolayer/releases/download/v0.5.6/nanolayer-x86_64-unknown-linux-gnu.tgz | tar fxvz - -C /bin; \
-    elif [ "$ARCH" = "aarch64" ]; then \
-        curl -sfL https://github.com/devcontainers-contrib/nanolayer/releases/download/v0.5.6/nanolayer-aarch64-unknown-linux-gnu.tgz | tar fxvz - -C /bin; \
-    else \
-        echo "Unsupported architecture: $ARCH" && exit 1; \
-    fi && \
-    chmod +x /bin/nanolayer
+COPY --from ensure-bins /bin/nanolayer /bin/nanolayer
 
 # # Repositories
 # RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg && \
