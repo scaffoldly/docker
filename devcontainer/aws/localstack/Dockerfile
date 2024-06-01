@@ -44,7 +44,7 @@ ENV LOCALSTACK_PATCH=${LOCALSTACK_PATCH}
 ARG NPM_MAJOR=latest
 ENV NPM_MAJOR=${NPM_MAJOR}
 
-COPY --from ensure-bins /bin/nanolayer /bin/nanolayer
+COPY --from=ensure-bins /bin/nanolayer /bin/nanolayer
 
 # # Repositories
 # RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg && \
