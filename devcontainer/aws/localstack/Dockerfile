@@ -1,5 +1,5 @@
-ARG BASE_IMAGE=jammy
-FROM mcr.microsoft.com/devcontainers/base:${BASE_IMAGE}
+ARG BASE_IMAGE=noble
+FROM ubuntu:${BASE_IMAGE}
 
 ENV BASE_IMAGE=${BASE_IMAGE}
 ARG NODE_MAJOR=20
