@@ -60,11 +60,11 @@ RUN curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xF23C5A6C
     curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null && \
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" > /etc/apt/sources.list.d/github-cli.list
 
-RUN nanolayer install apt "supervisor dnsutils netcat-openbsd"
+RUN nanolayer install apt "gh supervisor dnsutils netcat-openbsd"
 RUN nanolayer install apt "docker-ce docker-ce-cli containerd.io docker-compose-plugin docker-ce-rootless-extras docker-buildx-plugin"
 RUN nanolayer install apt "libsasl2-dev libsnappy-dev"
 RUN nanolayer install apt "nodejs"
-RUN nanolayer install apt "python${PYTHON_MAJOR}.${PYTHON_MINOR} python${PYTHON_MAJOR}.${PYTHON_MINOR}-dev python${PYTHON_MAJOR}.${PYTHON_MINOR}-venv"
+RUN nanolayer install apt "python${PYTHON_MAJOR}.${PYTHON_MINOR} python${PYTHON_MAJOR}.${PYTHON_MINOR}-dev python${PYTHON_MAJOR}.${PYTHON_MINOR}-venv python${PYTHON_MAJOR}.${PYTHON_MINOR}-pip"
 RUN nanolayer install apt "openjdk-${JAVA_MAJOR}-jdk openjdk-${JAVA_MAJOR}-jre"
 RUN nanolayer install apt "ruby${RUBY_MAJOR}.${RUBY_MINOR} ruby${RUBY_MAJOR}.${RUBY_MINOR}-dev"
 
