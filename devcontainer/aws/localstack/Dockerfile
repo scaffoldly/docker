@@ -75,11 +75,16 @@ RUN nanolayer install apt "nodejs" && \
 # Python
 RUN nanolayer install apt "python${PYTHON_MAJOR}.${PYTHON_MINOR} python${PYTHON_MAJOR}.${PYTHON_MINOR}-dev python${PYTHON_MAJOR}.${PYTHON_MINOR}-venv" && \
     update-alternatives --install /usr/bin/python python /usr/bin/python${PYTHON_MAJOR}.${PYTHON_MINOR} 1 && \
-    curl -fsSL https://bootstrap.pypa.io/get-pip.py | python
+    curl -fsSL https://bootstrap.pypa.io/get-pip.py | python && \
+    pip install --no-cache-dir pipx supervisor supervisor_checks amazon-kclpy
+ENV PATH="/root/.local/bin:${PATH}"
 # Java
 RUN nanolayer install apt "openjdk-${JAVA_MAJOR}-jdk openjdk-${JAVA_MAJOR}-jre"
 # Ruby
 RUN nanolayer install apt "ruby${RUBY_MAJOR}.${RUBY_MINOR} ruby${RUBY_MAJOR}.${RUBY_MINOR}-dev"
+
+# Localstack / AWS
+
 
 # # Nvidia Repository (Ref: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
 # RUN curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
