@@ -46,7 +46,7 @@ ENV NPM_MAJOR=${NPM_MAJOR}
 
 COPY --from=ensure-bins /bin/nanolayer /bin/nanolayer
 
-RUN nanolayer install apt "ca-certificates curl gpg"
+RUN nanolayer install apt "ca-certificates curl gpg lsb-release"
 
 # Repositories
 RUN curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xF23C5A6CF475977595C89F51BA6932366A755776" | gpg --dearmor -o /etc/apt/keyrings/deadsnakes.gpg && \
