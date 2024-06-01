@@ -1,8 +1,8 @@
-ARG BASE_IMAGE=noble
+ARG BASE_IMAGE=jammy
 FROM ubuntu:${BASE_IMAGE} as ensure-bins
 
-RUN apt update &&
-    apt install -y curl
+RUN apt-get update &&
+    apt-get install -y curl
 
 RUN ARCH=$(uname -m) && \
     if [ "$ARCH" = "x86_64" ]; then \
