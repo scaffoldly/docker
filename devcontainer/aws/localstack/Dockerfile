@@ -1,7 +1,7 @@
 ARG BASE_IMAGE=jammy
 FROM ubuntu:${BASE_IMAGE} as ensure-bins
 
-RUN apt-get update &&
+RUN apt-get update && \
     apt-get install -y curl
 
 RUN ARCH=$(uname -m) && \
