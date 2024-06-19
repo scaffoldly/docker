@@ -166,6 +166,7 @@ RUN ARCH=$(uname -m) && \
 # Runtime Env
 ENV STAGE="local"
 ENV LOCALSTACK="false"
+ENV MOTO="true"
 
 # Cloud Switch-a-roo
 ENV CLOUD_PORT="5000"
