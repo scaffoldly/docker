@@ -138,6 +138,9 @@ COPY opt /opt
 COPY usr /usr
 COPY var /var
 
+# Docker Env
+ENV DOCKER_BUILDKIT=1
+
 # Localstack Env
 ENV ACTIVATE_PRO=0
 ENV TEST_AWS_ACCOUNT_ID="000000000000"
