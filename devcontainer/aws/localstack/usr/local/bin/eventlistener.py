@@ -164,7 +164,7 @@ def set_aws_config(port):
         os.system(f"aws configure set default.endpoint_url \"\"")
         return
 
-    endpoint_url = f"http://localhost.localstack.cloud:{port}"
+    endpoint_url = f"http://localhost:{port}"
 
     codespace_name = get_secret("CODESPACE_NAME")
     domain = get_secret("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN")
@@ -185,6 +185,10 @@ def load_localstack_pod():
     write_stderr("NOT IMPLEMENTED: Restoring localstack state")
 
 
+def load_moto_state():
+    write_stderr("NOT IMPLEMENTED: Restoring moto state")
+
+
 def save_localstack_pod():
     pod_path = os.getenv("POD_PATH")
 
@@ -192,6 +196,10 @@ def save_localstack_pod():
         return
 
     write_stderr("NOT IMPLEMENTED: Saving localstack state")
+
+
+def save_moto_state():
+    write_stderr("NOT IMPLEMENTED: Saving moto state")
 
 
 def ensure_public_ports(exclude=[]):
@@ -209,8 +217,13 @@ def ensure_public_ports(exclude=[]):
 
 
 def main():
+    cloud_port = os.getenv("CLOUD_PORT", None)
+    
     localstack_port = os.getenv("LOCALSTACK_PORT", None)
     localstack_running = False
+
+    moto_port = os.getenv("MOTO_PORT", None)
+    moto_running = False
 
     while True:
         headers, body = listener.wait(sys.stdin, sys.stdout)
@@ -222,16 +235,22 @@ def main():
         write_stderr(f"Received {eventname} from {processname}.")
 
         if eventname == "TICK_5":
-            ensure_public_ports(exclude=[localstack_port])
+            ensure_public_ports(exclude=[localstack_port, moto_port])
 
+            # HACK: Startup ordering:
+            #       - it appears that the port flips back to private sometime in the startup process
             if localstack_running:
-                # HACK: Startup ordering:
-                #       - it appears that the port flips back to private sometime in the startup process
                 open_port(localstack_port)
 
+            if moto_running:
+                open_port(moto_port)
+
         if eventname == "PROCESS_STATE_STARTING":
-            if processname == "localstack":
+            if processname == "localstack" and cloud_port == localstack_port:
                 set_aws_config(localstack_port)
+
+            if processname == "moto" and cloud_port == moto_port:
+                set_aws_config(moto_port)
 
         if eventname == "PROCESS_STATE_RUNNING":
             if processname == "localstack":
@@ -240,13 +259,26 @@ def main():
                 load_localstack_pod()
                 localstack_running = True
 
+            if processname == "moto":
+                wait_for_port(moto_port)
+                open_port(moto_port)
+                load_moto_state()
+                moto_running = True
+
         if eventname == "PROCESS_STATE_STOPPING":
             if processname == "localstack":
                 localstack_running = False
                 save_localstack_pod()
 
+            if processname == "moto":
+                moto_running = False
+                save_moto_state()
+
         if eventname == "PROCESS_STATE_STOPPED":
-            if processname == "localstack":
+            if processname == "localstack" and cloud_port == localstack_port:
+                set_aws_config(None)
+
+            if processname == "moto" and cloud_port == moto_port:
                 set_aws_config(None)
 
         # acknowledge the event
