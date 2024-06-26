@@ -20,12 +20,6 @@ ARG HOMEBREW_MINOR=3
 ENV HOMEBREW_MINOR=${HOMEBREW_MINOR}
 ARG HOMEBREW_PATCH=0
 ENV HOMEBREW_PATCH=${HOMEBREW_PATCH}
-ARG LOCALSTACK_MAJOR=3
-ENV LOCALSTACK_MAJOR=${LOCALSTACK_MAJOR}
-ARG LOCALSTACK_MINOR=1
-ENV LOCALSTACK_MINOR=${LOCALSTACK_MINOR}
-ARG LOCALSTACK_PATCH=0
-ENV LOCALSTACK_PATCH=${LOCALSTACK_PATCH}
 ARG NPM_MAJOR=latest
 ENV NPM_MAJOR=${NPM_MAJOR}
 
@@ -77,11 +71,10 @@ RUN sudo add-apt-repository ppa:instructure/ruby && \
 
 # Node Tools
 RUN npm install --global npm@${NPM_MAJOR} yarn nx
-# Skipped: cdktf-cli
 
 # Python Tools
 RUN curl -fsSL https://bootstrap.pypa.io/get-pip.py | python
-RUN pip install --no-cache-dir pipx supervisor supervisor_checks amazon-kclpy
+RUN pip install --no-cache-dir pipx supervisor supervisor_checks
 ENV PATH="${PATH}:/root/.local/bin"
 
 # Linuxbrew
@@ -109,57 +102,11 @@ RUN mkdir -p \
   ${BREWPATH}/Cellar \
   && ln -s ${BREWGIT}/bin/brew ${BREWPATH}/bin/brew
 
-# RUN HOMEBREW_NO_ANALYTICS=1 HOMEBREW_NO_AUTO_UPDATE=1 brew tap --force homebrew/core \
-#   && gem install bundler -n /usr/bin \
-#   && brew install-bundler-gems --groups=all \
-#   && brew cleanup \
-#   && rm -rf ${XDG_CACHE_HOME}
-# WORKDIR /
-
-# AWS
-RUN pipx install awscli
-RUN pipx install awscliv2
-RUN pipx install awscli-local
-
-# Localstack
-RUN pipx install --include-deps localstack[full]==${LOCALSTACK_MAJOR}.${LOCALSTACK_MINOR}.${LOCALSTACK_PATCH}
-
+# Files
 COPY root /root
 COPY bin /bin
 COPY etc /etc
 COPY opt /opt
 COPY usr /usr
 COPY var /var
-
-# Docker Env
-ENV DOCKER_BUILDKIT=1
-
-# Localstack Env
-ENV ACTIVATE_PRO=0
-ENV TEST_AWS_ACCOUNT_ID="000000000000"
-ENV LOCALSTACK_PORT="4566"
-ENV GATEWAY_LISTEN="0.0.0.0:${LOCALSTACK_PORT}"
-ENV OVERRIDE_IN_DOCKER=1
-
-# AWS Env
-ENV AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE=1
-
-# Lambda Env
-ENV PATH="/var/runtime:/var/task:/var/task/node_modules/.bin:${PATH}"
-RUN ARCH=$(uname -m) && \
-    if [ "$ARCH" = "x86_64" ]; then \
-        curl -Lo /usr/local/bin/aws-lambda-rie https://github.com/aws/aws-lambda-runtime-interface-emulator/releases/download/v1.19/aws-lambda-rie; \
-    elif [ "$ARCH" = "aarch64" ]; then \
-        curl -Lo /usr/local/bin/aws-lambda-rie https://github.com/aws/aws-lambda-runtime-interface-emulator/releases/download/v1.19/aws-lambda-rie-arm64; \
-    else \
-        echo "Unsupported architecture: $ARCH" && exit 1; \
-    fi && \
-    chmod +x /usr/local/bin/aws-lambda-rie
-
-# Runtime Env
-ENV STAGE="local"
-ENV LOCALSTACK="true"
-# ENV POD_PATH="/var/lib/localstack/pod"
-
-# Root FS
 COPY ./_root /
