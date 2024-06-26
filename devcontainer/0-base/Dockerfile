@@ -1,7 +1,8 @@
-ARG BASE_IMAGE=jammy
-FROM mcr.microsoft.com/devcontainers/base:${BASE_IMAGE}
+ARG BASE_IMAGE=mcr.microsoft.com/devcontainers/base:jammy
+FROM ${BASE_IMAGE}
 
 ENV BASE_IMAGE=${BASE_IMAGE}
+ENV BASE_TAG=${BASE_TAG}
 ARG NODE_MAJOR=20
 ENV NODE_MAJOR=${NODE_MAJOR}
 ARG JAVA_MAJOR=17
