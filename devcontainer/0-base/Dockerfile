@@ -103,6 +103,10 @@ RUN mkdir -p \
   ${BREWPATH}/Cellar \
   && ln -s ${BREWGIT}/bin/brew ${BREWPATH}/bin/brew
 
+# Direnv Hooks
+RUN echo 'eval "$(direnv hook bash)"' >> /etc/bash.bashrc
+RUN echo 'eval "$(direnv hook zsh)"' >> /etc/zsh/zshrc
+
 # Files
 COPY root /root
 COPY bin /bin
