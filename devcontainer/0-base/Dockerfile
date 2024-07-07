@@ -50,7 +50,7 @@ RUN apt-get update && \
     supervisor nginx \
     nodejs \
     openjdk-${JAVA_MAJOR}-jdk openjdk-${JAVA_MAJOR}-jre \
-    gh \
+    gh direnv \
     && rm -rf /var/lib/apt/lists/*
 
 # Python Core Tooling
